@@ -58,6 +58,33 @@ export function releaseAllDocuments(): void {
   releaseDocumentsExcept(new Set());
 }
 
+/** Page count, via the same cached document the renderer uses. */
+export async function getPageCount(sourceId: string, bytes: Uint8Array): Promise<number> {
+  const doc = await loadDocument(sourceId, bytes);
+  return doc.numPages;
+}
+
+/**
+ * Non-whitespace character count of a page's existing text layer.
+ *
+ * OCR's skip-detection reads this. Still display-side work: it inspects the document, it never
+ * writes one.
+ */
+export async function getPageTextLength(
+  sourceId: string,
+  bytes: Uint8Array,
+  pageIndex: number,
+): Promise<number> {
+  const doc = await loadDocument(sourceId, bytes);
+  const page = await doc.getPage(pageIndex + 1);
+  const content = await page.getTextContent();
+  let count = 0;
+  for (const item of content.items) {
+    if ('str' in item) count += item.str.replace(/\s/g, '').length;
+  }
+  return count;
+}
+
 /* --- Render queue -------------------------------------------------------------------------- */
 
 /**

@@ -3,12 +3,16 @@
 How PDF bytes are read, assembled and written. Session state and undo live in
 [state-and-undo.md](state-and-undo.md).
 
-Two libraries, strictly separated:
+Libraries, strictly separated:
 
-- **pdf-lib** — assembly. The only thing that ever produces output bytes.
+- **pdf-lib** — assembly. Produces output bytes for everything except the qpdf pass.
 - **pdf.js (`pdfjs-dist`)** — display. Never produces output bytes.
+- **qpdf-wasm** — lossless structural rewriting only, via `shared/lib/qpdf.ts`.
+- **tesseract.js** — OCR recognition only; it never touches a PDF.
 
-Both are dynamically imported so neither lands in the homepage bundle.
+All four are dynamically imported so none lands in the homepage bundle. If you add a static
+`import … from 'pdf-lib'` to a module the registry reaches, pdf-lib is pulled into the entry
+chunk — check the build output after changing imports.
 
 ---
 
@@ -122,6 +126,24 @@ bytes.**
 
 ---
 
+## 4b. qpdf (`shared/lib/qpdf.ts`)
+
+`runQpdf(input, args)` is the only place qpdf-wasm is invoked. Call sites reduce to "what args do
+I pass" — `spec/maintainability.md` pain point #7 is the old app triplicating this.
+
+**A fresh module instance is created per call and never cached or shared.** qpdf's `callMain()`
+internally calls Emscripten's `exit()`, which permanently kills that instance. Only the dynamic
+import is cached. Success is decided by whether the output file reads back non-empty — not by
+`callMain`'s return value and not by the absence of a throw, since `callMain` can throw on a
+successful run.
+
+The wasm is a same-origin `?url` asset, and `wasmUrl` is injectable so the module works outside a
+browser (tests, a future prerender step).
+
+Compress uses it today; Protect and Unlock will use it unchanged.
+
+---
+
 ## 5. The shared workspace (`shared/components/workspace/`)
 
 | File | Role |
@@ -134,9 +156,22 @@ bytes.**
 One component, used by all five tools — `spec/features.md` §1.4 bundles those operations into a
 single screen. Tools differ only in the action rendered *below* it. **Do not fork it per tool.**
 
-dnd-kit sensor config is load-bearing: 6px pointer activation (so clicking a thumbnail's
-rotate/delete button never starts a drag) and 150ms hold + 6px tolerance for touch.
 `onDragEnd` dispatches `REORDER` with the full reordered array.
+
+### Generic pieces shared with the images-to-PDF grid
+
+`spec/maintainability.md` pain point #9: the old app maintained two independent copies of the
+drag-thumbnail-with-toolbar pattern, so a UX tweak to one silently diverged from the other. The
+*generic* parts live in `shared/` and both grids depend on them without depending on each other:
+
+| Module | What it owns |
+|---|---|
+| `shared/components/dnd/useDragSensors.ts` | The one sensor config: 6px pointer activation (so clicking a thumbnail's rotate/delete button never starts a drag), 150ms hold + 6px tolerance for touch |
+| `shared/components/ZoomModalChrome.tsx` | Escape-to-close, body-scroll-lock, backdrop-click-to-close |
+| `shared/components/ZoomStepper.tsx` | 20–300% zoom in 10% steps, typed percentage committing on blur/Enter, reset-on-subject-change |
+
+What stays per-feature is the content: `PageThumb`/`PageCanvas` render PDF pages, `ImageCard`
+renders an `<img>`.
 
 ---
 
@@ -152,6 +187,30 @@ rotate/delete button never starts a drag) and 150ms hold + 6px tolerance for tou
   Rotate, which differ only in button wording and filename suffix.
 
 `SplitTool.tsx` is the only one with its own panel, because it has settings.
+
+`src/tools/shared/SingleFileToolShell.tsx` is the equivalent for the single-purpose transforms
+(Compress, OCR): registry-driven heading, a one-file picker, then the tool's own config/running UI.
+It is deliberately **not** wired to the session store — those tools have no page plan and nothing
+to undo, and a user's in-progress merge session is not their input.
+
+### Compress specifics (`src/tools/optimize/compress/`)
+
+Two phases, both in a Web Worker. The three "never bigger" floors sit at three layers and **must
+not be collapsed**: per-image (`recompressImages.ts`), per-stage (`compressPipeline.ts` discards
+qpdf output that isn't smaller), per-document (`pickCompressResult.ts`, pure and React-free per
+`spec/maintainability.md` #4). Phase 2 always runs, even when phase 1 was skipped for lack of
+OffscreenCanvas — surface `imagesSupported` in the UI or a small result reads as a bug.
+
+Image recompression uses **object substitution**: a rebuilt stream is assigned onto the same
+`PDFRef`, so every page already drawing that image keeps working with no page-copying. `embedJpg`
+can only add an image, never swap one.
+
+### OCR specifics (`src/tools/optimize/ocr/`)
+
+`ocrDocument.ts` recognizes and never writes; `bakeOcrTextLayer.ts` writes and never runs
+Tesseract. Keep them separable — that is what makes recognition testable without a write-back
+dependency (`spec/edge-cases.md`). The bake goes through `shared/lib/geometry.ts`'s `toPdfRect`,
+the one normalized-rect ↔ PDF-rect conversion (pain point #5).
 
 ---
 

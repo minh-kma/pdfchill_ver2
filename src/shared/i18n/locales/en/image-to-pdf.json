@@ -2,5 +2,46 @@
   "name": "Image to PDF",
   "description": "Turn JPG and PNG images into a PDF, with page size and margins.",
   "seoTitle": "Convert images to PDF (JPG, PNG) — free | PDFChill",
-  "seoDescription": "Convert JPG and PNG images into a PDF with your choice of page size, orientation and margins. Free, no uploads."
+  "seoDescription": "Convert JPG and PNG images into a PDF with your choice of page size, orientation and margins. Free, no uploads.",
+  "uploadTitle": "Select JPG or PNG images",
+  "addMore": "Add more images",
+  "uploadSubtitle": "or drop them here — images never leave your device",
+  "chooseImages": "Choose images",
+  "imageCount_one": "{{count}} image",
+  "imageCount_other": "{{count}} images",
+  "sortAsc": "Sort A→Z",
+  "sortDesc": "Sort Z→A",
+  "rotateLeft": "Rotate left",
+  "rotateRight": "Rotate right",
+  "remove": "Remove image",
+  "pageSize": "Page size",
+  "pageSizes": {
+    "fit": "Fit to image",
+    "a4": "A4",
+    "letter": "Letter",
+    "legal": "Legal",
+    "a3": "A3",
+    "a5": "A5"
+  },
+  "orientation": "Orientation",
+  "orientationDisabled": "Not used when the page fits the image.",
+  "orientations": {
+    "auto": "Auto",
+    "portrait": "Portrait",
+    "landscape": "Landscape"
+  },
+  "margin": "Margin",
+  "margins": {
+    "none": "No margin",
+    "small": "Small",
+    "big": "Big"
+  },
+  "mergeIntoOne": "Merge all images into one PDF",
+  "action": "Convert to PDF",
+  "downloadZip": "Download .zip",
+  "zipNotice_one": "Previewing the first of {{count}} PDF. The download contains all of them.",
+  "zipNotice_other": "Previewing the first of {{count}} PDFs. The download contains all of them.",
+  "errors": {
+    "unsupported": "Skipped — only JPG and PNG are supported: {{files}}"
+  }
 }

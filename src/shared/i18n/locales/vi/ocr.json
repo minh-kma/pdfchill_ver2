@@ -2,5 +2,23 @@
   "name": "OCR PDF",
   "description": "Nhận dạng chữ để tệp PDF quét có thể tìm kiếm được.",
   "seoTitle": "OCR tệp PDF quét — tìm kiếm được, miễn phí | PDFChill",
-  "seoDescription": "Thêm lớp văn bản tìm kiếm được vào tệp PDF quét bằng OCR ngay trên trình duyệt. Miễn phí, không tải lên."
+  "seoDescription": "Thêm lớp văn bản tìm kiếm được vào tệp PDF quét bằng OCR ngay trên trình duyệt. Miễn phí, không tải lên.",
+  "languageLabel": "Ngôn ngữ tài liệu",
+  "languages": {
+    "eng": "Tiếng Anh",
+    "vie": "Tiếng Việt"
+  },
+  "disclosure": "Việc nhận dạng chạy hoàn toàn trong trình duyệt nên không có gì được tải lên. Điều đó cũng khiến nó chậm hơn và kém chính xác hơn dịch vụ đám mây — và mô hình ngôn ngữ sẽ được tải về trong lần dùng đầu tiên.",
+  "action": "Tạo tệp tìm kiếm được",
+  "progress": {
+    "starting": "Đang chuẩn bị…",
+    "recognizing": "Trang {{page}}/{{total}} — đang nhận dạng…",
+    "skipping": "Trang {{page}}/{{total}} — đã có văn bản, bỏ qua…",
+    "finishing": "Đang hoàn tất…",
+    "cannotCancel": "Quá trình này có thể lâu và không thể hủy."
+  },
+  "result": {
+    "summary_other": "Đã nhận dạng {{recognized}} trang. {{skipped}} trang đã có sẵn văn bản và được giữ nguyên.",
+    "review": "Xem lại và tải xuống"
+  }
 }

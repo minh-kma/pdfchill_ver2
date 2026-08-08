@@ -2,5 +2,24 @@
   "name": "OCR PDF",
   "description": "Make a scanned PDF searchable by recognising its text.",
   "seoTitle": "OCR a scanned PDF — make it searchable free | PDFChill",
-  "seoDescription": "Add a searchable text layer to a scanned PDF with in-browser OCR. Free, no uploads — nothing leaves your device."
+  "seoDescription": "Add a searchable text layer to a scanned PDF with in-browser OCR. Free, no uploads — nothing leaves your device.",
+  "languageLabel": "Document language",
+  "languages": {
+    "eng": "English",
+    "vie": "Vietnamese"
+  },
+  "disclosure": "Recognition runs entirely in your browser, so nothing is uploaded. That also makes it slower and a little less accurate than a cloud service — and the language model is downloaded once on first use.",
+  "action": "Make searchable",
+  "progress": {
+    "starting": "Preparing…",
+    "recognizing": "Page {{page}} of {{total}} — recognizing…",
+    "skipping": "Page {{page}} of {{total}} — already has text, skipping…",
+    "finishing": "Finishing up…",
+    "cannotCancel": "This can take a while and cannot be cancelled."
+  },
+  "result": {
+    "summary_one": "Recognized {{recognized}} page. {{skipped}} already had text and were left untouched.",
+    "summary_other": "Recognized {{recognized}} pages. {{skipped}} already had text and were left untouched.",
+    "review": "Review and download"
+  }
 }

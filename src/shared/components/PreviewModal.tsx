@@ -6,6 +6,16 @@ export interface PreviewModalProps {
   readonly bytes: Uint8Array;
   readonly fileName: string;
   readonly onClose: () => void;
+  /**
+   * Overrides what the Download button saves. Images to PDF with "merge" off uses this: the
+   * preview shows the first PDF as a stand-in, but the download is the whole zip
+   * (`spec/features.md` §1.11). The review-before-download rule still holds either way.
+   */
+  readonly onDownload?: () => void | Promise<void>;
+  /** i18n key for the Download button when `onDownload` replaces the default save. */
+  readonly downloadLabelKey?: string;
+  /** Replaces the iframe — used when the previewed bytes are only a stand-in. */
+  readonly notice?: string;
 }
 
 /**
@@ -13,7 +23,14 @@ export interface PreviewModalProps {
  * the real, assembled PDF rendered by the browser's own viewer in an `<iframe>`, and only then can
  * save it.
  */
-export function PreviewModal({ bytes, fileName, onClose }: PreviewModalProps) {
+export function PreviewModal({
+  bytes,
+  fileName,
+  onClose,
+  onDownload,
+  downloadLabelKey,
+  notice,
+}: PreviewModalProps) {
   const { t } = useTranslation();
   const [url, setUrl] = useState<string>();
   const [saving, setSaving] = useState(false);
@@ -39,7 +56,7 @@ export function PreviewModal({ bytes, fileName, onClose }: PreviewModalProps) {
   async function handleDownload() {
     setSaving(true);
     try {
-      await savePdf(bytes, fileName);
+      await (onDownload ? onDownload() : savePdf(bytes, fileName));
     } finally {
       setSaving(false);
     }
@@ -75,10 +92,15 @@ export function PreviewModal({ bytes, fileName, onClose }: PreviewModalProps) {
               disabled={saving}
               className="rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:opacity-60"
             >
-              {t('workspace:preview.download')}
+              {t(downloadLabelKey ?? 'workspace:preview.download')}
             </button>
           </div>
         </div>
+        {notice && (
+          <p className="border-b border-slate-200 bg-amber-50 px-4 py-2 text-xs text-amber-800">
+            {notice}
+          </p>
+        )}
         {url && <iframe src={url} title={fileName} className="min-h-0 flex-1 bg-slate-100" />}
       </div>
     </div>

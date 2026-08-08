@@ -7,6 +7,9 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   base: '/',
   plugins: [react(), tailwindcss()],
+  // The compress worker dynamically imports pdf-lib and qpdf-wasm, so it is a code-splitting
+  // build — which rules out the default IIFE worker format.
+  worker: { format: 'es' },
 });
 
 // import { defineConfig } from 'vite';

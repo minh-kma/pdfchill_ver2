@@ -2,5 +2,38 @@
   "name": "Nén PDF",
   "description": "Giảm dung lượng tệp mà vẫn giữ tài liệu dễ đọc.",
   "seoTitle": "Nén PDF — giảm dung lượng miễn phí | PDFChill",
-  "seoDescription": "Giảm dung lượng tệp PDF với mức chất lượng bạn chọn. Miễn phí, không tải lên."
+  "seoDescription": "Giảm dung lượng tệp PDF với mức chất lượng bạn chọn. Miễn phí, không tải lên.",
+  "levelLabel": "Mức nén",
+  "levels": {
+    "low": {
+      "name": "Thấp",
+      "hint": "Gần như không nhận ra. Giữ chất lượng in."
+    },
+    "medium": {
+      "name": "Trung bình",
+      "hint": "Khuyên dùng. Cân bằng dung lượng và chất lượng."
+    },
+    "high": {
+      "name": "Cao",
+      "hint": "Tệp nhỏ nhất. Dùng khi cần đạt giới hạn dung lượng."
+    }
+  },
+  "action": "Nén PDF",
+  "progress": {
+    "images": "Đang nén lại hình ảnh… {{done}}/{{total}}",
+    "structure": "Đang tối ưu cấu trúc tệp…",
+    "cannotCancel": "Quá trình này có thể mất một lúc và không thể hủy."
+  },
+  "result": {
+    "saved": "Nhỏ hơn {{percent}}%",
+    "noChange": "Đã ở mức nhỏ nhất có thể",
+    "review": "Xem lại và tải xuống",
+    "tryAnother": "Thử mức khác"
+  },
+  "detail": {
+    "noCanvas": "Trình duyệt của bạn không thể mã hóa lại hình ảnh nên chỉ chạy tối ưu cấu trúc không mất dữ liệu. Tệp vẫn hợp lệ — hãy thử trình duyệt mới hơn để giảm nhiều hơn.",
+    "alreadyOptimal": "Tệp PDF này đã được tối ưu nên tệp gốc được giữ lại.",
+    "imagesAlreadyEfficient": "Hình ảnh trong tệp đã đủ tối ưu nên chỉ áp dụng tối ưu cấu trúc không mất dữ liệu.",
+    "recompressed_other": "Đã nén lại {{count}} hình ảnh ở chất lượng {{level}}."
+  }
 }

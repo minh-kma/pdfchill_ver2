@@ -2,5 +2,39 @@
   "name": "Compress PDF",
   "description": "Shrink file size while keeping the document readable.",
   "seoTitle": "Compress a PDF — reduce file size free | PDFChill",
-  "seoDescription": "Reduce the size of a PDF with a quality level you choose. Free, no uploads — compression runs in your browser."
+  "seoDescription": "Reduce the size of a PDF with a quality level you choose. Free, no uploads — compression runs in your browser.",
+  "levelLabel": "Compression level",
+  "levels": {
+    "low": {
+      "name": "Low",
+      "hint": "Barely noticeable. Best for keeping print quality."
+    },
+    "medium": {
+      "name": "Medium",
+      "hint": "Recommended. Good balance of size and quality."
+    },
+    "high": {
+      "name": "High",
+      "hint": "Smallest file. Use when you need to hit a size limit."
+    }
+  },
+  "action": "Compress PDF",
+  "progress": {
+    "images": "Recompressing images… {{done}} of {{total}}",
+    "structure": "Optimizing file structure…",
+    "cannotCancel": "This can take a moment and cannot be cancelled."
+  },
+  "result": {
+    "saved": "{{percent}}% smaller",
+    "noChange": "Already as small as it gets",
+    "review": "Review and download",
+    "tryAnother": "Try another level"
+  },
+  "detail": {
+    "noCanvas": "Your browser cannot re-encode images, so only lossless structural optimisation ran. The file is still valid — try a newer browser for bigger savings.",
+    "alreadyOptimal": "This PDF was already optimised, so the original file was kept.",
+    "imagesAlreadyEfficient": "The images in this PDF were already efficient, so only lossless structural optimisation applied.",
+    "recompressed_one": "Recompressed {{count}} image at {{level}} quality.",
+    "recompressed_other": "Recompressed {{count}} images at {{level}} quality."
+  }
 }

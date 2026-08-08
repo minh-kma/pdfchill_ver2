@@ -2,5 +2,44 @@
   "name": "Ảnh sang PDF",
   "description": "Chuyển ảnh JPG và PNG thành PDF, tùy chỉnh khổ giấy và lề.",
   "seoTitle": "Chuyển ảnh sang PDF (JPG, PNG) — miễn phí | PDFChill",
-  "seoDescription": "Chuyển ảnh JPG và PNG thành tệp PDF với khổ giấy, hướng trang và lề tùy chọn. Miễn phí, không tải lên."
+  "seoDescription": "Chuyển ảnh JPG và PNG thành tệp PDF với khổ giấy, hướng trang và lề tùy chọn. Miễn phí, không tải lên.",
+  "uploadTitle": "Chọn ảnh JPG hoặc PNG",
+  "addMore": "Thêm ảnh",
+  "uploadSubtitle": "hoặc thả vào đây — ảnh không bao giờ rời khỏi thiết bị của bạn",
+  "chooseImages": "Chọn ảnh",
+  "imageCount_other": "{{count}} ảnh",
+  "sortAsc": "Sắp xếp A→Z",
+  "sortDesc": "Sắp xếp Z→A",
+  "rotateLeft": "Xoay trái",
+  "rotateRight": "Xoay phải",
+  "remove": "Xóa ảnh",
+  "pageSize": "Khổ giấy",
+  "pageSizes": {
+    "fit": "Vừa với ảnh",
+    "a4": "A4",
+    "letter": "Letter",
+    "legal": "Legal",
+    "a3": "A3",
+    "a5": "A5"
+  },
+  "orientation": "Hướng trang",
+  "orientationDisabled": "Không dùng khi trang vừa với ảnh.",
+  "orientations": {
+    "auto": "Tự động",
+    "portrait": "Dọc",
+    "landscape": "Ngang"
+  },
+  "margin": "Lề",
+  "margins": {
+    "none": "Không lề",
+    "small": "Nhỏ",
+    "big": "Lớn"
+  },
+  "mergeIntoOne": "Gộp tất cả ảnh vào một tệp PDF",
+  "action": "Chuyển sang PDF",
+  "downloadZip": "Tải .zip",
+  "zipNotice_other": "Đang xem tệp đầu tiên trong {{count}} tệp PDF. Bản tải xuống chứa tất cả.",
+  "errors": {
+    "unsupported": "Đã bỏ qua — chỉ hỗ trợ JPG và PNG: {{files}}"
+  }
 }

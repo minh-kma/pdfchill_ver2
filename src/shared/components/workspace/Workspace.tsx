@@ -1,24 +1,11 @@
-import {
-  DndContext,
-  KeyboardSensor,
-  PointerSensor,
-  TouchSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  SortableContext,
-  arrayMove,
-  rectSortingStrategy,
-  sortableKeyboardCoordinates,
-} from '@dnd-kit/sortable';
+import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, arrayMove, rectSortingStrategy } from '@dnd-kit/sortable';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { releaseDocumentsExcept } from '../../pdf/pdfRender.ts';
 import { useStore } from '../../state/store.tsx';
 import { ROTATION_STEP } from '../../lib/rotation.ts';
+import { useDragSensors } from '../dnd/useDragSensors.ts';
 import { RedoIcon, RotateIcon, UndoIcon } from '../icons.tsx';
 import { PageThumb } from './PageThumb.tsx';
 import { PageZoom } from './PageZoom.tsx';
@@ -45,13 +32,8 @@ export function Workspace() {
     releaseDocumentsExcept(new Set(state.sources.map((source) => source.id)));
   }, [state.sources]);
 
-  const sensors = useSensors(
-    // 6px of movement before a drag starts, so clicking a thumbnail's rotate/delete button never
-    // turns into a drag; touch needs a 150ms hold with 6px tolerance (SPEC.md §1.4).
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 6 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
-  );
+  // Shared with the images-to-PDF grid — see useDragSensors for why the numbers matter.
+  const sensors = useDragSensors();
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;

@@ -9,6 +9,8 @@ export interface FileDropzoneProps {
   readonly buttonLabel: string;
   readonly compact?: boolean;
   readonly busy?: boolean;
+  /** Advisory only — every tool sniffs real bytes before trusting a file (`spec/features.md` §1.11). */
+  readonly accept?: string;
   readonly onFiles: (files: File[]) => void;
 }
 
@@ -20,6 +22,7 @@ export function FileDropzone({
   buttonLabel,
   compact,
   busy,
+  accept = 'application/pdf,.pdf',
   onFiles,
 }: FileDropzoneProps) {
   const { t } = useTranslation();
@@ -70,7 +73,7 @@ export function FileDropzone({
       <input
         ref={inputRef}
         type="file"
-        accept="application/pdf,.pdf"
+        accept={accept}
         multiple={multiple}
         hidden
         onChange={(event) => {

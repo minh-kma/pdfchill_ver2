@@ -33,6 +33,9 @@ import {
   WatermarkIcon,
 } from './shared/components/icons.tsx';
 import { ComingSoonTool } from './tools/ComingSoonTool.tsx';
+import { ImageToPdfTool } from './tools/convert/ImageToPdfTool.tsx';
+import { CompressTool } from './tools/optimize/compress/CompressTool.tsx';
+import { OcrTool } from './tools/optimize/ocr/OcrTool.tsx';
 import { DeletePagesTool } from './tools/organize/DeletePagesTool.tsx';
 import { MergeTool } from './tools/organize/MergeTool.tsx';
 import { ReorderTool } from './tools/organize/ReorderTool.tsx';
@@ -88,9 +91,9 @@ const TOOL_SEEDS = [
   { id: 'reorder', category: 'organize', slug: 'reorder-pdf-pages', icon: ReorderIcon, Component: ReorderTool },
   { id: 'delete-pages', category: 'organize', slug: 'delete-pdf-pages', icon: DeletePagesIcon, Component: DeletePagesTool },
   { id: 'rotate', category: 'organize', slug: 'rotate-pdf', icon: RotateIcon, Component: RotateTool },
-  { id: 'compress', category: 'optimize', slug: 'compress-pdf', icon: CompressIcon, Component: ComingSoonTool },
-  { id: 'ocr', category: 'optimize', slug: 'ocr-pdf', icon: OcrIcon, Component: ComingSoonTool },
-  { id: 'image-to-pdf', category: 'convert', slug: 'image-to-pdf', icon: ImageToPdfIcon, Component: ComingSoonTool },
+  { id: 'compress', category: 'optimize', slug: 'compress-pdf', icon: CompressIcon, Component: CompressTool },
+  { id: 'ocr', category: 'optimize', slug: 'ocr-pdf', icon: OcrIcon, Component: OcrTool },
+  { id: 'image-to-pdf', category: 'convert', slug: 'image-to-pdf', icon: ImageToPdfIcon, Component: ImageToPdfTool },
   { id: 'watermark', category: 'edit', slug: 'watermark-pdf', icon: WatermarkIcon, Component: ComingSoonTool },
   { id: 'protect', category: 'security', slug: 'protect-pdf', icon: ProtectIcon, Component: ComingSoonTool },
   { id: 'unlock', category: 'security', slug: 'unlock-pdf', icon: UnlockIcon, Component: ComingSoonTool },
