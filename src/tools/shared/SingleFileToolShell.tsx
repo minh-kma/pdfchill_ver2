@@ -4,8 +4,8 @@ import { ErrorBanner } from '../../shared/components/ErrorBanner.tsx';
 import { FileDropzone } from '../../shared/components/FileDropzone.tsx';
 import { formatBytes } from '../../shared/lib/formatBytes.ts';
 import { toErrorKey } from '../../shared/lib/errorKeys.ts';
-import { EncryptedPdfError, hasEncryptMarker } from '../../shared/lib/pdfCore.ts';
-import type { AppError } from '../../shared/state/useAddSources.ts';
+import type { AppError } from '../../shared/state/appError.ts';
+import { SKIPPED, useUnlockGate } from '../../shared/state/useUnlockGate.tsx';
 import type { ToolDefinition } from '../../toolRegistry.ts';
 
 export interface LoadedFile {
@@ -17,22 +17,40 @@ export interface LoadedFile {
 
 export interface SingleFileToolShellProps {
   readonly tool: ToolDefinition;
+  /**
+   * Unlock sets this: it is the one tool that *wants* the still-encrypted bytes, since decrypting
+   * them is the whole job. Every other tool goes through the unlock gate first.
+   */
+  readonly acceptEncrypted?: boolean;
+  readonly uploadTitleKey?: string;
+  readonly uploadSubtitleKey?: string;
   readonly children: (file: LoadedFile, reset: () => void) => ReactNode;
 }
 
 /**
- * Layout for the single-purpose transforms (Compress, OCR): registry-driven heading, one-file
- * picker, then the tool's own config/running UI.
+ * Layout for the single-file tools (Compress, OCR, Protect, Unlock): registry-driven heading,
+ * one-file picker, then the tool's own config/running UI.
  *
  * Deliberately **not** wired to the Organize session store: these tools transform one uploaded
  * file and hand it back. They have no page plan, nothing to undo, and no reason to make a user's
  * in-progress merge session their input.
+ *
+ * Encrypted input is decrypted through the shared unlock gate before the tool ever sees it
+ * (`spec/features.md` §1.7), so a tool body can assume plaintext — unless it opted into
+ * `acceptEncrypted`.
  */
-export function SingleFileToolShell({ tool, children }: SingleFileToolShellProps) {
+export function SingleFileToolShell({
+  tool,
+  acceptEncrypted = false,
+  uploadTitleKey = 'workspace:upload.title',
+  uploadSubtitleKey = 'workspace:upload.subtitle',
+  children,
+}: SingleFileToolShellProps) {
   const { t } = useTranslation();
   const [file, setFile] = useState<LoadedFile>();
   const [error, setError] = useState<AppError>();
   const [busy, setBusy] = useState(false);
+  const { ensureDecrypted, passwordPrompt } = useUnlockGate();
 
   async function accept(files: readonly File[]) {
     const picked = files[0];
@@ -40,16 +58,17 @@ export function SingleFileToolShell({ tool, children }: SingleFileToolShellProps
     setBusy(true);
     setError(undefined);
     try {
-      const bytes = new Uint8Array(await picked.arrayBuffer());
-      // Encrypted input can't be transformed; say so up front rather than failing mid-run.
-      if (hasEncryptMarker(bytes)) throw new EncryptedPdfError(picked.name);
+      const raw = new Uint8Array(await picked.arrayBuffer());
+      const bytes = acceptEncrypted ? raw : await ensureDecrypted(raw, picked.name);
+      if (bytes === SKIPPED) return;
+
       setFile({
         name: picked.name,
         bytes,
         baseName: picked.name.replace(/\.pdf$/i, '') || 'document',
       });
     } catch (failure) {
-      setError({ key: toErrorKey(failure), params: { file: picked.name } });
+      setError({ key: toErrorKey(failure, `loading "${picked.name}"`), params: { file: picked.name } });
     } finally {
       setBusy(false);
     }
@@ -69,8 +88,8 @@ export function SingleFileToolShell({ tool, children }: SingleFileToolShellProps
         <FileDropzone
           multiple={false}
           busy={busy}
-          title={t('workspace:upload.title')}
-          subtitle={t('workspace:upload.subtitle')}
+          title={t(uploadTitleKey)}
+          subtitle={t(uploadSubtitleKey)}
           buttonLabel={t('workspace:upload.button')}
           onFiles={(files) => void accept(files)}
         />
@@ -92,6 +111,8 @@ export function SingleFileToolShell({ tool, children }: SingleFileToolShellProps
           {children(file, () => setFile(undefined))}
         </>
       )}
+
+      {passwordPrompt}
     </div>
   );
 }

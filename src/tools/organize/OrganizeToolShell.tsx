@@ -4,7 +4,7 @@ import { ErrorBanner } from '../../shared/components/ErrorBanner.tsx';
 import { FileDropzone } from '../../shared/components/FileDropzone.tsx';
 import { Workspace } from '../../shared/components/workspace/Workspace.tsx';
 import { useStore } from '../../shared/state/store.tsx';
-import { useAddSources } from '../../shared/state/useAddSources.ts';
+import { useAddSources } from '../../shared/state/useAddSources.tsx';
 import type { ToolDefinition } from '../../toolRegistry.ts';
 
 export interface OrganizeToolShellProps {
@@ -39,7 +39,7 @@ export function OrganizeToolShell({
 }: OrganizeToolShellProps) {
   const { t } = useTranslation();
   const { state } = useStore();
-  const { addFiles, busy, error, clearError } = useAddSources();
+  const { addFiles, busy, error, clearError, passwordPrompt } = useAddSources();
 
   const hasPages = state.pages.length > 0;
 
@@ -73,6 +73,9 @@ export function OrganizeToolShell({
           <div className="mt-6">{children}</div>
         </>
       )}
+
+      {/* An encrypted upload is decrypted here, before it can reach the store. */}
+      {passwordPrompt}
     </div>
   );
 }

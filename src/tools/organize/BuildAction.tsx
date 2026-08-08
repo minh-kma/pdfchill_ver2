@@ -6,7 +6,7 @@ import { DownloadIcon } from '../../shared/components/icons.tsx';
 import { toErrorKey } from '../../shared/lib/errorKeys.ts';
 import { buildPdf, planBaseName } from '../../shared/lib/pdfCore.ts';
 import { useStore } from '../../shared/state/store.tsx';
-import type { AppError } from '../../shared/state/useAddSources.ts';
+import type { AppError } from '../../shared/state/useAddSources.tsx';
 
 export interface BuildActionProps {
   /** i18n key for the button. */
@@ -33,11 +33,15 @@ export function BuildAction({ labelKey, suffix }: BuildActionProps) {
     setBusy(true);
     setError(undefined);
     try {
-      const plan = { sources: state.sources, pages: state.pages };
+      const plan = {
+        sources: state.sources,
+        pages: state.pages,
+        bake: { docAnnotations: state.docAnnotations, assets: state.assets },
+      };
       const bytes = await buildPdf(plan);
       setResult({ bytes, fileName: `${planBaseName(plan)}_${suffix}.pdf` });
     } catch (failure) {
-      setError({ key: toErrorKey(failure) });
+      setError({ key: toErrorKey(failure, `assembling ${suffix} output`) });
     } finally {
       setBusy(false);
     }

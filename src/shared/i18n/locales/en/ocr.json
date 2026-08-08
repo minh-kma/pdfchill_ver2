@@ -18,8 +18,9 @@
     "cannotCancel": "This can take a while and cannot be cancelled."
   },
   "result": {
-    "summary_one": "Recognized {{recognized}} page. {{skipped}} already had text and were left untouched.",
-    "summary_other": "Recognized {{recognized}} pages. {{skipped}} already had text and were left untouched.",
+    "summary": "Recognized {{recognized}}. Left {{skipped}} untouched — they already had text.",
+    "pages_one": "{{count}} page",
+    "pages_other": "{{count}} pages",
     "review": "Review and download"
   }
 }

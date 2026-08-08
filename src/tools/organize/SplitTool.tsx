@@ -7,7 +7,7 @@ import { toErrorKey } from '../../shared/lib/errorKeys.ts';
 import { planBaseName, splitPdf } from '../../shared/lib/pdfCore.ts';
 import { buildRanges, eachPageRanges } from '../../shared/lib/splitRanges.ts';
 import { useStore } from '../../shared/state/store.tsx';
-import type { AppError } from '../../shared/state/useAddSources.ts';
+import type { AppError } from '../../shared/state/useAddSources.tsx';
 import type { ToolPageProps } from '../../toolRegistry.ts';
 import { OrganizeToolShell } from './OrganizeToolShell.tsx';
 
@@ -51,7 +51,12 @@ function SplitPanel() {
     setBusy(true);
     setError(undefined);
     try {
-      const plan = { sources: state.sources, pages: state.pages };
+      const plan = {
+        sources: state.sources,
+        pages: state.pages,
+        // Marks are baked into every part, exactly as Download would produce them.
+        bake: { docAnnotations: state.docAnnotations, assets: state.assets },
+      };
       const baseName = planBaseName(plan);
       const parts = await splitPdf(plan, ranges, baseName);
 
@@ -61,7 +66,7 @@ function SplitPanel() {
       const blob = await zip.generateAsync({ type: 'blob' });
       downloadBlob(blob, `${baseName}_split.zip`);
     } catch (failure) {
-      setError({ key: toErrorKey(failure) });
+      setError({ key: toErrorKey(failure, 'splitting document') });
     } finally {
       setBusy(false);
     }

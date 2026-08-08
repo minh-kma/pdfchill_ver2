@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { releaseDocumentsExcept } from '../../pdf/pdfRender.ts';
 import { useStore } from '../../state/store.tsx';
+import { clearSessionPassword } from '../../state/sessionPassword.ts';
 import { ROTATION_STEP } from '../../lib/rotation.ts';
 import { useDragSensors } from '../dnd/useDragSensors.ts';
 import { RedoIcon, RotateIcon, UndoIcon } from '../icons.tsx';
@@ -91,7 +92,11 @@ export function Workspace() {
 
           <button
             type="button"
-            onClick={() => dispatch({ type: 'RESET' })}
+            onClick={() => {
+              // The unlock password is cleared on Start Over (`spec/edge-cases.md`).
+              clearSessionPassword();
+              dispatch({ type: 'RESET' });
+            }}
             className="ms-1 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
           >
             {t('workspace:actions.startOver')}

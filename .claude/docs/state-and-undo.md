@@ -42,6 +42,10 @@ Actions:
 | { type: 'ROTATE_PAGE'; pageId; delta }
 | { type: 'ROTATE_ALL'; delta }
 | { type: 'REORDER'; pages }        // the FULL reordered array
+| { type: 'ADD_DOC_ANNOTATION'; annotation }
+| { type: 'UPDATE_DOC_ANNOTATION'; annotation }
+| { type: 'DELETE_DOC_ANNOTATION'; annotationId }
+| { type: 'ADD_ASSET'; asset }
 | { type: 'RESET' }
 | { type: 'UNDO' } | { type: 'REDO' }
 ```
@@ -50,11 +54,16 @@ Actions:
 
 ## 3. History rules
 
-Undo snapshots the whole edit slice — `EditSnapshot { pages }` — not per-field. Watermark and
-page-number annotations join that slice when those tools are built.
+Undo snapshots the whole edit slice — `EditSnapshot { pages, docAnnotations }` — not per-field.
+Undoing a watermark edit and undoing a page delete therefore share one linear history; there is no
+way to undo just one axis. Page-number annotations join the same slice when built.
 
-- **Undoable:** `ADD_SOURCE`, `DELETE_PAGE`, `ROTATE_PAGE`, `ROTATE_ALL`, `REORDER` (the `UNDOABLE`
-  set in `store.tsx`).
+- **Undoable:** `ADD_SOURCE`, `DELETE_PAGE`, `ROTATE_PAGE`, `ROTATE_ALL`, `REORDER`,
+  `ADD_DOC_ANNOTATION`, `UPDATE_DOC_ANNOTATION`, `DELETE_DOC_ANNOTATION` (the `UNDOABLE` set in
+  `store.tsx`).
+- **`ADD_ASSET` is deliberately NOT undoable** (`spec/edge-cases.md`): assets are append-only and
+  keyed by content hash (FNV-1a, `shared/lib/hash.ts`), so re-uploading identical bytes reuses the
+  entry and there is nothing meaningful to roll back to.
 - **Not undoable:** `RESET` — a whole-session replacement, so it clears history instead of being
   recorded in it.
 - **Cap: 50 entries** (`HISTORY_LIMIT`), oldest silently dropped.
@@ -100,6 +109,25 @@ would silently roll back a page edit (`spec/features.md` §1.12).
 `spec/features.md` §1.12 also puts undo/redo *buttons* in the AppBar. The nav bar is
 registry-generated and out of scope for the current step, so they live in the workspace toolbar
 instead. The shortcuts are global either way.
+
+---
+
+## 4b. The unlock gate (`useUnlockGate.tsx`)
+
+Not undo-related, but it is the reason `SourceDoc.bytes` can be assumed plaintext.
+
+Every upload path — `useAddSources` for the page-plan tools, `SingleFileToolShell` for the
+transforms — runs picked bytes through `ensureDecrypted()` before anything else sees them
+(`spec/features.md` §1.7). Retry order: session-cached password, then an empty string (which is
+what owner-only files need), then a visible prompt with unlimited retries and a Skip action that
+continues the rest of a batch.
+
+The password lives in `shared/state/sessionPassword.ts` — module-scoped, **memory only**, never
+written to storage, cleared on Start Over. It is deliberately outside `AppState` so it can never be
+captured in an undo snapshot or a future persisted session.
+
+Only `UnlockTool` opts out, via `SingleFileToolShell`'s `acceptEncrypted` — decrypting is its job,
+so it needs the encrypted bytes.
 
 ---
 

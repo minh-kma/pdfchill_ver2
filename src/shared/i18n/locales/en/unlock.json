@@ -2,5 +2,25 @@
   "name": "Remove password",
   "description": "Strip the password from a PDF you can already open.",
   "seoTitle": "Remove a PDF password — unlock free | PDFChill",
-  "seoDescription": "Remove the password from a PDF you already know the password for. Free, no uploads — decryption runs in your browser."
+  "seoDescription": "Remove the password from a PDF you already know the password for. Free, no uploads — decryption runs in your browser.",
+  "uploadTitle": "Select a password-protected PDF",
+  "uploadSubtitle": "or drop it here — the file never leaves your device",
+  "checking": "Checking this file…",
+  "needsPassword": "This PDF needs a password to open. Enter it below.",
+  "ownerOnly": "This PDF has owner/permission restrictions but no open password. Leave the box empty and select Remove password.",
+  "ownerOnlyPlaceholder": "Leave empty",
+  "action": "Remove password",
+  "prompt": {
+    "title": "This PDF is password-protected",
+    "label": "Password",
+    "submit": "Unlock",
+    "skip": "Skip this file",
+    "show": "Show",
+    "hide": "Hide",
+    "wrong": "That password did not work. Try again."
+  },
+  "errors": {
+    "notEncrypted": "\"{{file}}\" is not password-protected — there is nothing to unlock.",
+    "wrongPassword": "That password did not work. Try again."
+  }
 }

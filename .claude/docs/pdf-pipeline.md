@@ -68,13 +68,20 @@ of the batch continues.
 implement a new page-drawing feature as an isolated function that bypasses this pipeline."
 
 ```ts
-interface PagePlan { sources: readonly SourceDoc[]; pages: readonly PageItem[] }
+interface PagePlan {
+  sources: readonly SourceDoc[];
+  pages: readonly PageItem[];
+  bake: BakeInput;            // required — pass EMPTY_BAKE when there are no marks
+}
 
 copyPagesToPdf(plan: PagePlan): Promise<Uint8Array>
 buildPdf(plan): Promise<Uint8Array>                              // = copyPagesToPdf
 splitPdf(plan, ranges: PageRange[], baseName): Promise<SplitPart[]>
 planBaseName(plan): string                                       // first source's name, minus .pdf
 ```
+
+`bake` is deliberately **required, not optional**: an optional field would let a new export path
+silently omit the watermark, which is the exact guarantee the shared pipeline exists to enforce.
 
 `buildPdf()` and `splitPdf()` are thin wrappers, so a split part is byte-identical to what Download
 would have produced for those pages.
@@ -88,6 +95,21 @@ Two behaviours it must keep:
 
 Deleted pages need no handling — they are simply not in the plan. An empty plan throws
 `EmptyPlanError`.
+
+### The bake hook
+
+`annotationBake.ts` is called from inside `copyPagesToPdf`'s loop and **from nowhere else**. That
+is what makes a watermark survive a later merge, split or rotate: it is re-drawn every time the
+document is regenerated, rather than being burned into bytes once by its own tool.
+`spec/edge-cases.md`: "Never implement a new page-drawing feature as an isolated function that
+bypasses this pipeline."
+
+Marks are drawn *after* rotation is applied, so they sit on the page as the user sees it. Page
+numbers, when built, extend `drawDocAnnotation` — they do not get a second path.
+
+All positions come from `shared/lib/watermarkGeometry.ts`, which the **live preview also consumes**
+(`spec/maintainability.md` #6: the old app had three independent copies of this formula). If you
+change a visual rule, change it there and both follow.
 
 Loaded source documents are cached per call in a local `Map`, so a 40-page merge parses each file
 once.
@@ -139,6 +161,21 @@ successful run.
 
 The wasm is a same-origin `?url` asset, and `wasmUrl` is injectable so the module works outside a
 browser (tests, a future prerender step).
+
+**Import `@jspawn/qpdf-wasm/qpdf.js`, never `qpdf.mjs`.** The package's ESM wrapper sets
+`globalThis.exports = {}`, loads the CJS build as a loose script, and reads the factory back off
+that global. Any bundler with CommonJS interop rewrites the CJS `exports` to a module-local object,
+so the global stays empty and the wrapper falls through to an identifier it never declares:
+
+```js
+(globalThis.exports.Module || createModule).apply(undefined, args)
+//                            ^^^^^^^^^^^^ ReferenceError at call time
+```
+
+That shipped once and broke Compress, Add password, Remove password and the unlock gate at the same
+time. Node harnesses do **not** catch it: `qpdf.mjs` branches on `globalThis.process`, so under
+Node it takes a `require()` path that works and the browser branch is never executed. Any test that
+must cover this has to run with `process` absent.
 
 Compress uses it today; Protect and Unlock will use it unchanged.
 

@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ErrorBanner } from '../../../shared/components/ErrorBanner.tsx';
 import { PreviewModal } from '../../../shared/components/PreviewModal.tsx';
+import { toErrorKey } from '../../../shared/lib/errorKeys.ts';
 import { createId } from '../../../shared/lib/ids.ts';
 import { releaseDocumentsExcept } from '../../../shared/pdf/pdfRender.ts';
-import type { AppError } from '../../../shared/state/useAddSources.ts';
+import type { AppError } from '../../../shared/state/useAddSources.tsx';
 import type { ToolPageProps } from '../../../toolRegistry.ts';
 import { SingleFileToolShell, type LoadedFile } from '../../shared/SingleFileToolShell.tsx';
 import { bakeOcrTextLayer } from './bakeOcrTextLayer.ts';
@@ -83,8 +84,8 @@ function OcrPanel({ file }: { file: LoadedFile }) {
         recognized: pages.filter((page) => !page.skipped).length,
         skipped: pages.filter((page) => page.skipped).length,
       });
-    } catch {
-      if (!cancelled.current) setError({ key: 'workspace:errors.generic' });
+    } catch (failure) {
+      if (!cancelled.current) setError({ key: toErrorKey(failure, `ocr "${file.name}"`) });
     } finally {
       if (!cancelled.current) {
         setRunning(false);
@@ -125,8 +126,15 @@ function OcrPanel({ file }: { file: LoadedFile }) {
 
       {result ? (
         <div>
+          {/* Two independent counts, so each is pluralised on its own before being composed —
+              i18next keys carry a single `count`. Passing {recognized, skipped} to a key that
+              only exists as `summary_one`/`summary_other` resolves to nothing and renders the raw
+              key, which is exactly how this shipped broken. */}
           <p className="text-sm font-semibold text-slate-900">
-            {t('ocr:result.summary', { recognized: result.recognized, skipped: result.skipped })}
+            {t('ocr:result.summary', {
+              recognized: t('ocr:result.pages', { count: result.recognized }),
+              skipped: t('ocr:result.pages', { count: result.skipped }),
+            })}
           </p>
           <button
             type="button"

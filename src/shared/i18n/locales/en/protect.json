@@ -2,5 +2,16 @@
   "name": "Add password",
   "description": "Encrypt a PDF so it can only be opened with your password.",
   "seoTitle": "Password protect a PDF — free AES-256 | PDFChill",
-  "seoDescription": "Encrypt a PDF with a password so only you and the people you choose can open it. Free, no uploads."
+  "seoDescription": "Encrypt a PDF with a password so only you and the people you choose can open it. Free, no uploads.",
+  "password": "Password",
+  "confirm": "Confirm password",
+  "note": "Encrypted with AES-256. There is one password — the same one opens the file everywhere. Nothing is uploaded; encryption happens in your browser.",
+  "action": "Protect PDF",
+  "previewOverlay": "Your PDF is now password-protected — download it below.",
+  "errors": {
+    "empty": "Enter a password.",
+    "mismatch": "The two passwords do not match.",
+    "alreadyEncrypted": "\"{{file}}\" is already password-protected. Remove its password first.",
+    "failed": "Could not protect this PDF. Please try again."
+  }
 }

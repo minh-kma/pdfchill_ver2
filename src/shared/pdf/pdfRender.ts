@@ -7,6 +7,7 @@
  */
 
 import type { PDFDocumentProxy } from 'pdfjs-dist';
+import { hasEncryptMarker } from '../lib/pdfCore.ts';
 // Bundled and served same-origin (a `?url` import, not a CDN) so the app keeps working offline
 // after first load — SPEC.md §5.
 import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
@@ -56,6 +57,49 @@ export function releaseDocumentsExcept(activeSourceIds: ReadonlySet<string>): vo
 
 export function releaseAllDocuments(): void {
   releaseDocumentsExcept(new Set());
+}
+
+/* --- Encryption probe ------------------------------------------------------------------------ */
+
+export interface EncryptionProbe {
+  readonly encrypted: boolean;
+  /** True when opening the file needs a user password; false for owner-only/permissions-only. */
+  readonly needsUserPassword: boolean;
+}
+
+/**
+ * Two-layered encryption detection (`spec/edge-cases.md`, "Security / passwords").
+ *
+ * 1. **pdf.js is authoritative for user-password files** — opening one raises a
+ *    `PasswordException`.
+ * 2. Owner-only / permissions-only files open *silently* in pdf.js, so the raw bytes are
+ *    additionally scanned for the ASCII `/Encrypt` marker, which is always present unencrypted in
+ *    the trailer because a reader needs it to locate the Encrypt dictionary.
+ *
+ * `pdf-lib` is deliberately **not** used for detection: it throws generic parse errors on
+ * encrypted input rather than a clean "this is encrypted" signal.
+ *
+ * Uncached and self-destroying: probing must not poison the render cache, and the caller may hand
+ * over decrypted bytes straight after.
+ */
+export async function probeEncryption(bytes: Uint8Array): Promise<EncryptionProbe> {
+  const pdfjs = await getPdfjs();
+  const task = pdfjs.getDocument({ data: bytes.slice() });
+
+  try {
+    const doc = await task.promise;
+    await doc.loadingTask.destroy();
+    // Opened without complaint — only the byte scan can reveal owner-only encryption.
+    return { encrypted: hasEncryptMarker(bytes), needsUserPassword: false };
+  } catch (error) {
+    void task.destroy().catch(() => undefined);
+    if (error instanceof pdfjs.PasswordException) {
+      return { encrypted: true, needsUserPassword: true };
+    }
+    // Not a password problem: report what the byte scan says and let the caller's own parse fail
+    // with a proper typed error.
+    return { encrypted: hasEncryptMarker(bytes), needsUserPassword: false };
+  }
 }
 
 /** Page count, via the same cached document the renderer uses. */
@@ -120,6 +164,8 @@ export interface RenderPageOptions {
   readonly width: number;
   readonly canvas: HTMLCanvasElement;
   readonly signal: AbortSignal;
+  /** Reports the page's unscaled size in PDF points — what callers need to map points to pixels. */
+  readonly onPageSize?: (widthPt: number, heightPt: number) => void;
 }
 
 /**
@@ -139,6 +185,7 @@ export async function renderPage(options: RenderPageOptions): Promise<void> {
   // is what gets passed — the same addition `copyPagesToPdf` performs when writing the real file.
   const total = ((page.rotate + rotation) % 360 + 360) % 360;
   const unscaled = page.getViewport({ scale: 1, rotation: total });
+  options.onPageSize?.(unscaled.width, unscaled.height);
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const viewport = page.getViewport({ scale: (width * dpr) / unscaled.width, rotation: total });
 

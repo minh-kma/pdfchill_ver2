@@ -2,5 +2,16 @@
   "name": "Đặt mật khẩu",
   "description": "Mã hóa tệp PDF để chỉ mở được bằng mật khẩu của bạn.",
   "seoTitle": "Đặt mật khẩu cho PDF — miễn phí, AES-256 | PDFChill",
-  "seoDescription": "Mã hóa tệp PDF bằng mật khẩu để chỉ bạn và người bạn chọn mới mở được. Miễn phí, không tải lên."
+  "seoDescription": "Mã hóa tệp PDF bằng mật khẩu để chỉ bạn và người bạn chọn mới mở được. Miễn phí, không tải lên.",
+  "password": "Mật khẩu",
+  "confirm": "Xác nhận mật khẩu",
+  "note": "Mã hóa AES-256. Chỉ có một mật khẩu — dùng chung để mở tệp ở mọi nơi. Không có gì được tải lên; việc mã hóa diễn ra trong trình duyệt.",
+  "action": "Bảo vệ PDF",
+  "previewOverlay": "Tệp PDF của bạn đã được đặt mật khẩu — tải xuống bên dưới.",
+  "errors": {
+    "empty": "Hãy nhập mật khẩu.",
+    "mismatch": "Hai mật khẩu không khớp.",
+    "alreadyEncrypted": "“{{file}}” đã được đặt mật khẩu. Hãy gỡ mật khẩu trước.",
+    "failed": "Không thể bảo vệ tệp PDF này. Vui lòng thử lại."
+  }
 }

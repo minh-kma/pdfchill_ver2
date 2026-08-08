@@ -32,8 +32,8 @@ import {
   UnlockIcon,
   WatermarkIcon,
 } from './shared/components/icons.tsx';
-import { ComingSoonTool } from './tools/ComingSoonTool.tsx';
 import { ImageToPdfTool } from './tools/convert/ImageToPdfTool.tsx';
+import { WatermarkTool } from './tools/edit/WatermarkTool.tsx';
 import { CompressTool } from './tools/optimize/compress/CompressTool.tsx';
 import { OcrTool } from './tools/optimize/ocr/OcrTool.tsx';
 import { DeletePagesTool } from './tools/organize/DeletePagesTool.tsx';
@@ -41,6 +41,8 @@ import { MergeTool } from './tools/organize/MergeTool.tsx';
 import { ReorderTool } from './tools/organize/ReorderTool.tsx';
 import { RotateTool } from './tools/organize/RotateTool.tsx';
 import { SplitTool } from './tools/organize/SplitTool.tsx';
+import { ProtectTool } from './tools/security/ProtectTool.tsx';
+import { UnlockTool } from './tools/security/UnlockTool.tsx';
 
 /* --- Categories ---------------------------------------------------------------------------- */
 
@@ -80,10 +82,8 @@ interface ToolSeed {
 }
 
 /**
- * The 11 tools. Every field a tool has is either listed here or derived from `id` below.
- *
- * The Organize five are implemented; the rest are still `ComingSoonTool` and swap in one entry at
- * a time in later steps, with no other file touched.
+ * The 11 tools, all implemented. Every field a tool has is either listed here or derived from `id`
+ * below. Adding tool #12 is one row here plus its two locale files — nothing else.
  */
 const TOOL_SEEDS = [
   { id: 'merge', category: 'organize', slug: 'merge-pdf', icon: MergeIcon, Component: MergeTool },
@@ -94,9 +94,9 @@ const TOOL_SEEDS = [
   { id: 'compress', category: 'optimize', slug: 'compress-pdf', icon: CompressIcon, Component: CompressTool },
   { id: 'ocr', category: 'optimize', slug: 'ocr-pdf', icon: OcrIcon, Component: OcrTool },
   { id: 'image-to-pdf', category: 'convert', slug: 'image-to-pdf', icon: ImageToPdfIcon, Component: ImageToPdfTool },
-  { id: 'watermark', category: 'edit', slug: 'watermark-pdf', icon: WatermarkIcon, Component: ComingSoonTool },
-  { id: 'protect', category: 'security', slug: 'protect-pdf', icon: ProtectIcon, Component: ComingSoonTool },
-  { id: 'unlock', category: 'security', slug: 'unlock-pdf', icon: UnlockIcon, Component: ComingSoonTool },
+  { id: 'watermark', category: 'edit', slug: 'watermark-pdf', icon: WatermarkIcon, Component: WatermarkTool },
+  { id: 'protect', category: 'security', slug: 'protect-pdf', icon: ProtectIcon, Component: ProtectTool },
+  { id: 'unlock', category: 'security', slug: 'unlock-pdf', icon: UnlockIcon, Component: UnlockTool },
 ] as const satisfies readonly ToolSeed[];
 
 export type ToolId = (typeof TOOL_SEEDS)[number]['id'];

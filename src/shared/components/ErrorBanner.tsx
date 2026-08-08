@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import type { AppError } from '../state/useAddSources.ts';
+import type { AppError } from '../state/useAddSources.tsx';
 
 /**
  * Renders a translated error. SPEC.md §5: the UI never shows a raw `Error.message` — callers pass

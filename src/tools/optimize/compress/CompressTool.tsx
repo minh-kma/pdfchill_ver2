@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ErrorBanner } from '../../../shared/components/ErrorBanner.tsx';
 import { PreviewModal } from '../../../shared/components/PreviewModal.tsx';
+import { toErrorKey } from '../../../shared/lib/errorKeys.ts';
 import { formatBytes, percentReduction } from '../../../shared/lib/formatBytes.ts';
-import type { AppError } from '../../../shared/state/useAddSources.ts';
+import type { AppError } from '../../../shared/state/useAddSources.tsx';
 import type { ToolPageProps } from '../../../toolRegistry.ts';
 import { SingleFileToolShell, type LoadedFile } from '../../shared/SingleFileToolShell.tsx';
 import { COMPRESSION_LEVEL_IDS, DEFAULT_LEVEL, type CompressionLevel } from './compressLevels.ts';
@@ -76,8 +77,8 @@ function CompressPanel({ file }: { file: LoadedFile }) {
         replaced: result.replaced,
         level,
       });
-    } catch {
-      if (!cancelled.current) setError({ key: 'workspace:errors.generic' });
+    } catch (failure) {
+      if (!cancelled.current) setError({ key: toErrorKey(failure, `compress "${file.name}"`) });
     } finally {
       if (!cancelled.current) setRunning(false);
     }

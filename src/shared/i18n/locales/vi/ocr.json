@@ -18,7 +18,8 @@
     "cannotCancel": "Quá trình này có thể lâu và không thể hủy."
   },
   "result": {
-    "summary_other": "Đã nhận dạng {{recognized}} trang. {{skipped}} trang đã có sẵn văn bản và được giữ nguyên.",
+    "summary": "Đã nhận dạng {{recognized}}. Giữ nguyên {{skipped}} vì đã có sẵn văn bản.",
+    "pages_other": "{{count}} trang",
     "review": "Xem lại và tải xuống"
   }
 }

@@ -8,7 +8,14 @@ import {
   type ReactNode,
 } from 'react';
 import { normalizeRotation } from '../lib/rotation.ts';
-import type { AppState, EditSnapshot, PageItem, SourceDoc } from './types.ts';
+import type {
+  AppState,
+  Asset,
+  DocAnnotation,
+  EditSnapshot,
+  PageItem,
+  SourceDoc,
+} from './types.ts';
 import { useUndoRedoShortcuts } from './useUndoRedoShortcuts.ts';
 
 /* --- Actions ------------------------------------------------------------------------------- */
@@ -19,6 +26,10 @@ export type Action =
   | { type: 'ROTATE_PAGE'; pageId: string; delta: number }
   | { type: 'ROTATE_ALL'; delta: number }
   | { type: 'REORDER'; pages: readonly PageItem[] }
+  | { type: 'ADD_DOC_ANNOTATION'; annotation: DocAnnotation }
+  | { type: 'UPDATE_DOC_ANNOTATION'; annotation: DocAnnotation }
+  | { type: 'DELETE_DOC_ANNOTATION'; annotationId: string }
+  | { type: 'ADD_ASSET'; asset: Asset }
   | { type: 'RESET' }
   | { type: 'UNDO' }
   | { type: 'REDO' };
@@ -36,12 +47,24 @@ const UNDOABLE: ReadonlySet<Action['type']> = new Set<Action['type']>([
   'ROTATE_PAGE',
   'ROTATE_ALL',
   'REORDER',
+  'ADD_DOC_ANNOTATION',
+  'UPDATE_DOC_ANNOTATION',
+  'DELETE_DOC_ANNOTATION',
 ]);
+// `ADD_ASSET` is deliberately excluded (`spec/edge-cases.md`): assets are append-only and
+// referenced by content hash, so there is nothing meaningful to roll back to.
 
 /** SPEC.md §3.2: oldest entries silently dropped past this. */
 const HISTORY_LIMIT = 50;
 
-export const initialState: AppState = { sources: [], pages: [], past: [], future: [] };
+export const initialState: AppState = {
+  sources: [],
+  pages: [],
+  docAnnotations: [],
+  assets: {},
+  past: [],
+  future: [],
+};
 
 /* --- Core reducer (pure state transitions, no history bookkeeping) ------------------------- */
 
@@ -91,10 +114,45 @@ const coreReducer = (state: AppState, action: Action): AppState =>
         return;
       }
 
+      case 'ADD_DOC_ANNOTATION': {
+        draft.docAnnotations.push(castDraft(action.annotation));
+        return;
+      }
+
+      case 'UPDATE_DOC_ANNOTATION': {
+        const index = draft.docAnnotations.findIndex((item) => item.id === action.annotation.id);
+        if (index === -1) return; // No-op: nothing to update, so no history entry.
+        draft.docAnnotations[index] = castDraft(action.annotation);
+        return;
+      }
+
+      case 'DELETE_DOC_ANNOTATION': {
+        const index = draft.docAnnotations.findIndex((item) => item.id === action.annotationId);
+        if (index === -1) return;
+        draft.docAnnotations.splice(index, 1);
+        return;
+      }
+
+      case 'ADD_ASSET': {
+        // Content-hashed and deduplicated: re-uploading byte-identical data reuses the entry
+        // rather than storing a duplicate (`spec/edge-cases.md`).
+        if (draft.assets[action.asset.hash]) return;
+        draft.assets[action.asset.hash] = castDraft(action.asset);
+        return;
+      }
+
       case 'RESET': {
-        if (draft.sources.length === 0 && draft.pages.length === 0) return;
+        if (
+          draft.sources.length === 0 &&
+          draft.pages.length === 0 &&
+          draft.docAnnotations.length === 0
+        ) {
+          return;
+        }
         draft.sources = [];
         draft.pages = [];
+        draft.docAnnotations = [];
+        draft.assets = {};
         return;
       }
 
@@ -107,11 +165,18 @@ const coreReducer = (state: AppState, action: Action): AppState =>
 
 /* --- History wrapper ----------------------------------------------------------------------- */
 
-const editSlice = (state: AppState): EditSnapshot => ({ pages: state.pages });
+// Undo granularity is "the whole edit slice", not per-field (`spec/data-model.md` §3.2): undoing a
+// watermark edit and undoing a page delete share one linear history. Cheap in practice because
+// immer's structural sharing means an unchanged array keeps its old reference in the snapshot.
+const editSlice = (state: AppState): EditSnapshot => ({
+  pages: state.pages,
+  docAnnotations: state.docAnnotations,
+});
 
 const applySlice = (state: AppState, slice: EditSnapshot): AppState => ({
   ...state,
   pages: slice.pages,
+  docAnnotations: slice.docAnnotations,
 });
 
 export function reducer(state: AppState, action: Action): AppState {

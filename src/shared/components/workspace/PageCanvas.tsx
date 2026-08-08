@@ -8,13 +8,15 @@ export interface PageCanvasProps {
   /** Target CSS width in px. */
   readonly width: number;
   readonly className?: string;
+  /** The page's unscaled size in PDF points, for callers mapping points to preview pixels. */
+  readonly onPageSize?: (widthPt: number, heightPt: number) => void;
 }
 
 /**
  * One rendered page. The single place a PDF page is drawn to a canvas — the thumbnail grid and the
  * zoom modal both use it, so there is one render/abort implementation rather than one per caller.
  */
-export function PageCanvas({ source, page, width, className }: PageCanvasProps) {
+export function PageCanvas({ source, page, width, className, onPageSize }: PageCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
 
@@ -33,6 +35,7 @@ export function PageCanvas({ source, page, width, className }: PageCanvasProps) 
       width,
       canvas,
       signal: controller.signal,
+      ...(onPageSize ? { onPageSize } : {}),
     })
       .then(() => {
         if (!controller.signal.aborted) setStatus('ready');

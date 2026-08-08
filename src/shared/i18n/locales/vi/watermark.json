@@ -2,5 +2,33 @@
   "name": "Đóng dấu mờ",
   "description": "Chèn chữ hoặc hình ảnh lên các trang của bạn.",
   "seoTitle": "Thêm dấu mờ vào PDF — miễn phí | PDFChill",
-  "seoDescription": "Chèn dấu mờ dạng chữ hoặc hình ảnh lên mọi trang của tệp PDF. Miễn phí, không tải lên."
+  "seoDescription": "Chèn dấu mờ dạng chữ hoặc hình ảnh lên mọi trang của tệp PDF. Miễn phí, không tải lên.",
+  "mode": {
+    "text": "Chữ",
+    "image": "Hình ảnh"
+  },
+  "textLabel": "Nội dung dấu mờ",
+  "textPlaceholder": "ví dụ: MẬT",
+  "size": "Cỡ chữ",
+  "angle": "Góc nghiêng",
+  "color": "Màu sắc",
+  "opacity": "Độ mờ",
+  "chooseImage": "Chọn ảnh PNG hoặc JPG",
+  "replaceImage": "Đổi ảnh",
+  "imageHint": "Vẽ ở giữa, rộng bằng 50% chiều ngang trang, giữ nguyên tỷ lệ.",
+  "pages": "Trang áp dụng",
+  "allPages": "Tất cả các trang",
+  "pageRange": "Khoảng trang",
+  "from": "Từ trang",
+  "to": "Đến trang",
+  "invalidRange": "Nhập khoảng từ 1 đến {{total}}, trang đầu không được sau trang cuối.",
+  "apply": "Áp dụng dấu mờ",
+  "update": "Cập nhật dấu mờ",
+  "remove": "Xóa dấu mờ",
+  "applied": "Đã áp dụng dấu mờ. Dấu sẽ có trong mọi tệp xuất ra — kể cả sau khi gộp, tách hay xoay.",
+  "preview": "Xem trước (trang 1)",
+  "action": "Lưu PDF có dấu mờ",
+  "errors": {
+    "unsupportedImage": "Chỉ hỗ trợ ảnh PNG và JPG: {{file}}"
+  }
 }

@@ -9,8 +9,8 @@ references. Not a roadmap.
 sed -n '/^const TOOL_SEEDS/,/satisfies readonly ToolSeed/p' src/toolRegistry.ts
 ```
 
-Any row whose `Component` is `ComingSoonTool` is a placeholder: the route, nav entry, homepage card
-and SEO metadata all exist and work, but the page renders "Coming soon — <Tool Name>".
+All 11 rows now point at a real component. `src/tools/ComingSoonTool.tsx` still exists as the
+placeholder for a future tool #12, but nothing in the registry references it.
 
 ---
 
@@ -26,36 +26,43 @@ and SEO metadata all exist and work, but the page renders "Coming soon — <Tool
 | 6 | `compress` | optimize | `/compress-pdf/` | `CompressTool` | **Implemented** |
 | 7 | `ocr` | optimize | `/ocr-pdf/` | `OcrTool` | **Implemented** |
 | 8 | `image-to-pdf` | convert | `/image-to-pdf/` | `ImageToPdfTool` | **Implemented** |
-| 9 | `watermark` | edit | `/watermark-pdf/` | `ComingSoonTool` | Placeholder |
-| 10 | `protect` | security | `/protect-pdf/` | `ComingSoonTool` | Placeholder |
-| 11 | `unlock` | security | `/unlock-pdf/` | `ComingSoonTool` | Placeholder |
+| 9 | `watermark` | edit | `/watermark-pdf/` | `WatermarkTool` | **Implemented** |
+| 10 | `protect` | security | `/protect-pdf/` | `ProtectTool` | **Implemented** |
+| 11 | `unlock` | security | `/unlock-pdf/` | `UnlockTool` | **Implemented** |
 
 Vietnamese routes are the same slugs under `/vi/` — e.g. `/vi/merge-pdf/`.
 
-**8 of 11 implemented.** They fall into two groups, deliberately built differently:
+**11 of 11 implemented.** They fall into two groups, deliberately built differently:
 
-- **Organize (5)** — Merge, Split, Reorder, Delete pages, Rotate. Page-manipulation workflows
-  sharing one pipeline ([pdf-pipeline.md](pdf-pipeline.md)) and one session store
-  ([state-and-undo.md](state-and-undo.md)), so a user can merge, then delete pages, then rotate
-  without re-uploading.
-- **Optimize + Convert (3)** — Compress, OCR, Image to PDF. Single-purpose transforms: one file in,
-  one result out. They are **not** wired to the session store — no page plan, nothing to undo. They
-  reuse shared pieces only where behaviour genuinely overlaps (drag sensors, zoom-modal chrome,
-  `PreviewModal`, typed errors).
+- **Page-plan tools (6)** — Merge, Split, Reorder, Delete pages, Rotate, **Watermark**. They share
+  one pipeline ([pdf-pipeline.md](pdf-pipeline.md)) and one session store
+  ([state-and-undo.md](state-and-undo.md)), so a user can merge, delete pages, then rotate without
+  re-uploading. Watermark belongs here rather than with the transforms: it stores a
+  `DocAnnotation` on the plan and the mark is drawn by the shared bake, which is what makes it
+  survive a later merge/split/rotate.
+- **Single-file transforms (5)** — Compress, OCR, Image to PDF, Add password, Remove password. One
+  file in, one result out. **Not** wired to the session store — no page plan, nothing to undo. They
+  reuse shared pieces only where behaviour genuinely overlaps (`SingleFileToolShell`, drag sensors,
+  zoom-modal chrome, `PreviewModal`, `runQpdf`, typed errors).
 
 ---
 
-## What exists for the Organize five
+## What exists for the page-plan tools
 
-- `src/tools/organize/` — `OrganizeToolShell`, `BuildAction`, and the five tool components
+- `src/tools/organize/` — `OrganizeToolShell`, `BuildAction`, and the five Organize components
   (12–20 lines each; only `SplitTool` has its own settings panel).
 - Full workspace: thumbnail grid, drag-to-reorder, per-page rotate/delete, zoom modal, undo/redo.
 - `PreviewModal` before every download; Split downloads a zip directly.
+- **Watermark** (`src/tools/edit/`) — text or image mode, applied by dispatching a `DocAnnotation`
+  rather than by producing bytes. `shared/lib/annotationBake.ts` draws it from inside
+  `copyPagesToPdf`, and `shared/lib/watermarkGeometry.ts` is the one formula the bake *and* the
+  live preview both consume. Exactly one watermark can exist at a time; reopening edits it.
 
-## What exists for Compress / OCR / Image to PDF
+## What exists for the single-file transforms
 
 - `src/tools/shared/SingleFileToolShell.tsx` — one-file picker plus registry-driven heading, used
-  by Compress and OCR. Rejects encrypted input up front rather than failing mid-run.
+  by all five. Encrypted input is decrypted through the shared unlock gate before the tool body
+  sees it; `acceptEncrypted` opts out, and only Unlock sets it.
 - **Compress** (`src/tools/optimize/compress/`) — both phases run in a Web Worker
   (`compressWorker.ts`): lossy image recompression via OffscreenCanvas, then the always-run
   lossless qpdf structural pass. All three "never bigger" floors are in place; `pickCompressResult`
@@ -69,39 +76,44 @@ Vietnamese routes are the same slugs under `/vi/` — e.g. `/vi/merge-pdf/`.
   options, per-image rotation, and both output modes (one merged PDF, or one PDF per image zipped).
   Staged-image state is local to the screen, not in the global store.
 
-## What exists for the other three
+- **Add password** (`src/tools/security/protectPdf.ts`) — AES-256 via `runQpdf`, owner password set
+  equal to the user password. Rejects an empty/whitespace password and an already-encrypted input
+  before qpdf is invoked. Its preview uses `PreviewModal`'s `overlay` — the only user of that prop,
+  because a browser renders an encrypted PDF as its own password prompt.
+- **Remove password** (`src/tools/security/pdfUnlock.ts`) — two-layered detection
+  (`probeEncryption` in `shared/pdf/pdfRender.ts`), then `qpdf --decrypt`. Result goes to
+  `PreviewModal` and never touches the page-plan store.
 
-Watermark, Add password, Remove password: registry row, route, nav entry, homepage card, SEO
-metadata, and `{en,vi}` locale files with the four registry keys. Nothing else. Their locale files
-have **no** `action` key yet.
+## Encrypted uploads are handled app-wide
+
+`shared/state/useUnlockGate.tsx` sits in **every** upload path — `useAddSources` (page-plan tools)
+and `SingleFileToolShell` (transforms). An encrypted file is decrypted before it can become a
+`SourceDoc`, so everything downstream works on plaintext (`spec/features.md` §1.7). Retry order is
+session-cached password, then empty string, then a prompt with unlimited retries and Skip. The
+password lives in `shared/state/sessionPassword.ts` — memory only, cleared on Start Over.
 
 ---
 
 ## What is missing repo-wide
 
-- **qpdf-wasm** (`@jspawn/qpdf-wasm`) and **tesseract.js** are now installed, and both lazy-load
-  into their own chunks (verified in the build output). Reach qpdf only through
-  `shared/lib/qpdf.ts`'s `runQpdf` — Protect and Unlock will use it unchanged.
-- Still absent, and not to be assumed present: session autosave / recovery (IndexedDB),
-  prerendering + `sitemap.xml`, ad units, accounts.
+Every tool is built. Still absent, and not to be assumed present: session autosave / recovery
+(IndexedDB), prerendering + `sitemap.xml`, ad units, accounts.
 
 `StoreProvider` already accepts an `initial` state, which is the hydration point session recovery
 will use.
 
 ---
 
-## Implementing a placeholder
+## Adding tool #12
 
-1. Read that tool's behaviour in `spec/features.md`, plus every entry that names it in
-   `spec/edge-cases.md`. The edge cases are not optional — each one exists because of a specific
-   shipped bug or browser limitation.
-2. Follow [architecture.md](architecture.md) §2 step 4: build the component, then flip that one
-   registry row's `Component`. No other file changes.
-3. If it manipulates pages, build on `OrganizeToolShell` + the shared pipeline. If it is an
-   independent single-purpose transform, build on `SingleFileToolShell` — it does not need the page
-   plan, but its output still goes through `PreviewModal`, and it still throws typed errors mapped
-   by `toErrorKey()`. Watermark is the interesting remaining case: it is a page-level mark, so it
-   belongs on the shared bake pipeline rather than being a one-off transform.
-4. Add the `action` key (and any panel keys) to **both** `locales/en/<id>.json` and
-   `locales/vi/<id>.json`.
+1. Read the behaviour in `spec/features.md`, plus every entry naming it in `spec/edge-cases.md`.
+   The edge cases are not optional — each exists because of a specific shipped bug or browser
+   limitation.
+2. Follow [architecture.md](architecture.md) §2: build the component, add one registry row and two
+   locale files. No other file changes.
+3. Pick the right base. Does it change which pages exist, their order, or what is drawn on them?
+   Build on `OrganizeToolShell` + the shared pipeline, and if it draws on pages, extend
+   `annotationBake.ts` rather than writing a second drawing path. Otherwise build on
+   `SingleFileToolShell`. Either way the output goes through `PreviewModal` and errors are typed.
+4. Add `action` (and any panel keys) to **both** `locales/en/<id>.json` and `locales/vi/<id>.json`.
 5. Update this file.

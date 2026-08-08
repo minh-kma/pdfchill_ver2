@@ -1,4 +1,8 @@
-declare module '@jspawn/qpdf-wasm/qpdf.mjs' {
+/**
+ * The package's CommonJS build. We import this rather than its `qpdf.mjs` ESM wrapper — see the
+ * comment in `shared/lib/qpdf.ts` for why the wrapper cannot survive bundling.
+ */
+declare module '@jspawn/qpdf-wasm/qpdf.js' {
   interface QpdfFS {
     writeFile(path: string, data: Uint8Array): void;
     readFile(path: string): Uint8Array;

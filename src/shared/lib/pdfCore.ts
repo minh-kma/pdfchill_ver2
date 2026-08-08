@@ -18,6 +18,7 @@
 import type { PDFDocument } from 'pdf-lib';
 import { normalizeRotation } from './rotation.ts';
 import { createId } from './ids.ts';
+import { type BakeInput, bakePage, createBakeContext, isBakeEmpty } from './annotationBake.ts';
 import type { PageItem, SourceDoc } from '../state/types.ts';
 
 /* --- Errors -------------------------------------------------------------------------------- */
@@ -83,11 +84,13 @@ export interface LoadedSource {
 }
 
 /**
- * Parses an uploaded file into the page-plan model exactly once. Callers keep the returned
- * `SourceDoc.bytes` for the rest of the session; nothing re-reads the File.
+ * Parses uploaded bytes into the page-plan model exactly once. Callers keep the returned
+ * `SourceDoc.bytes` for the rest of the session; nothing re-reads the file.
+ *
+ * Takes bytes rather than a `File` because the upload path has already read them to probe for
+ * encryption — and, when the file was encrypted, what arrives here is the *decrypted* bytes.
  */
-export async function readSource(file: File): Promise<LoadedSource> {
-  const bytes = new Uint8Array(await file.arrayBuffer());
+export async function readSource(bytes: Uint8Array, fileName: string): Promise<LoadedSource> {
   const { PDFDocument } = await import('pdf-lib');
 
   let doc: PDFDocument;
@@ -96,13 +99,13 @@ export async function readSource(file: File): Promise<LoadedSource> {
   } catch {
     // pdf-lib throws generic parse errors on encrypted input (SPEC.md §2), so the marker decides
     // which of the two user-facing messages is right.
-    throw hasEncryptMarker(bytes) ? new EncryptedPdfError(file.name) : new InvalidPdfError(file.name);
+    throw hasEncryptMarker(bytes) ? new EncryptedPdfError(fileName) : new InvalidPdfError(fileName);
   }
 
   const pageCount = doc.getPageCount();
-  if (pageCount === 0) throw new InvalidPdfError(file.name);
+  if (pageCount === 0) throw new InvalidPdfError(fileName);
 
-  const source: SourceDoc = { id: createId('src'), name: file.name, bytes, pageCount };
+  const source: SourceDoc = { id: createId('src'), name: fileName, bytes, pageCount };
   const pages: PageItem[] = Array.from({ length: pageCount }, (_, index) => ({
     id: createId('pg'),
     sourceId: source.id,
@@ -118,7 +121,16 @@ export async function readSource(file: File): Promise<LoadedSource> {
 export interface PagePlan {
   readonly sources: readonly SourceDoc[];
   readonly pages: readonly PageItem[];
+  /**
+   * Document-level marks to bake in. Required, not optional, on purpose: making it optional would
+   * let a new export path silently omit the watermark, which is exactly the guarantee
+   * `spec/edge-cases.md` asks the shared pipeline to enforce. Pass `EMPTY_BAKE` when there are none.
+   */
+  readonly bake: BakeInput;
 }
+
+/** No marks. Explicit so a caller states its intent rather than forgetting a field. */
+export const EMPTY_BAKE: BakeInput = { docAnnotations: [], assets: {} };
 
 /**
  * Copies the plan's pages into a fresh document, **one page at a time, in plan order**.
@@ -133,11 +145,18 @@ export interface PagePlan {
 export async function copyPagesToPdf(plan: PagePlan): Promise<Uint8Array> {
   if (plan.pages.length === 0) throw new EmptyPlanError();
 
-  const { PDFDocument, degrees } = await import('pdf-lib');
+  const pdfLib = await import('pdf-lib');
+  const { PDFDocument, degrees } = pdfLib;
   const out = await PDFDocument.create();
 
   const sourcesById = new Map(plan.sources.map((source) => [source.id, source]));
   const loaded = new Map<string, PDFDocument>();
+
+  // The bake runs inside this loop, so every regenerated output — Download, Split, anything built
+  // later — carries the same marks. There is no second drawing path (`spec/edge-cases.md`).
+  const bakeContext = isBakeEmpty(plan.bake)
+    ? undefined
+    : createBakeContext(pdfLib, out, plan.bake);
 
   for (const item of plan.pages) {
     let doc = loaded.get(item.sourceId);
@@ -152,6 +171,9 @@ export async function copyPagesToPdf(plan: PagePlan): Promise<Uint8Array> {
     if (!copied) continue;
     copied.setRotation(degrees(normalizeRotation(copied.getRotation().angle + item.rotation)));
     out.addPage(copied);
+
+    // Marks are drawn after rotation is applied, so they sit on the page as the user sees it.
+    if (bakeContext) await bakePage(bakeContext, copied, out.getPageCount());
   }
 
   if (out.getPageCount() === 0) throw new EmptyPlanError();
@@ -190,6 +212,8 @@ export async function splitPdf(
     const bytes = await copyPagesToPdf({
       sources: plan.sources,
       pages: plan.pages.slice(range.start - 1, range.end),
+      // Marks are baked into every part, same as Download would produce for those pages.
+      bake: plan.bake,
     });
     parts.push({ name: `${baseName}_part${index + 1}_p${range.start}-${range.end}.pdf`, bytes });
   }

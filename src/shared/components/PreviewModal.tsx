@@ -14,8 +14,16 @@ export interface PreviewModalProps {
   readonly onDownload?: () => void | Promise<void>;
   /** i18n key for the Download button when `onDownload` replaces the default save. */
   readonly downloadLabelKey?: string;
-  /** Replaces the iframe — used when the previewed bytes are only a stand-in. */
+  /** Banner shown above the iframe — used when the previewed bytes are only a stand-in. */
   readonly notice?: string;
+  /**
+   * Replaces the iframe entirely.
+   *
+   * Used by Protect and only by Protect (`spec/features.md` §1.8): a browser can only render an
+   * encrypted PDF as its own native password prompt inside an `<iframe>`, which would be baffling
+   * right after the user chose that exact password. The Download button still works underneath.
+   */
+  readonly overlay?: string;
 }
 
 /**
@@ -30,6 +38,7 @@ export function PreviewModal({
   onDownload,
   downloadLabelKey,
   notice,
+  overlay,
 }: PreviewModalProps) {
   const { t } = useTranslation();
   const [url, setUrl] = useState<string>();
@@ -101,7 +110,13 @@ export function PreviewModal({
             {notice}
           </p>
         )}
-        {url && <iframe src={url} title={fileName} className="min-h-0 flex-1 bg-slate-100" />}
+        {overlay ? (
+          <div className="grid min-h-0 flex-1 place-items-center bg-slate-50 p-8 text-center">
+            <p className="max-w-sm text-sm font-medium text-slate-700">{overlay}</p>
+          </div>
+        ) : (
+          url && <iframe src={url} title={fileName} className="min-h-0 flex-1 bg-slate-100" />
+        )}
       </div>
     </div>
   );

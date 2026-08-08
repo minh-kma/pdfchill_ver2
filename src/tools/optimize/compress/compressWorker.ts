@@ -6,6 +6,7 @@
  */
 
 import type { CompressionLevel } from './compressLevels.ts';
+import { logUnexpectedError } from '../../../shared/lib/logError.ts';
 import { runCompressPipeline } from './compressPipeline.ts';
 
 export interface CompressRequest {
@@ -23,7 +24,9 @@ export type CompressResponse =
       readonly replaced: number;
       readonly structuralHelped: boolean;
     }
-  | { readonly type: 'error' };
+  // The real failure, forwarded across the worker boundary. Without this the main thread only
+  // ever learned "something failed", which is how a ReferenceError in qpdf went unseen.
+  | { readonly type: 'error'; readonly message: string; readonly stack: string | undefined };
 
 const post = (message: CompressResponse, transfer?: Transferable[]) =>
   (self as unknown as DedicatedWorkerGlobalScope).postMessage(message, transfer ?? []);
@@ -36,9 +39,14 @@ self.onmessage = async (event: MessageEvent<CompressRequest>) => {
     );
     // Transfer the output buffer rather than structured-cloning a multi-MB copy.
     post({ type: 'done', ...result }, [result.bytes.buffer as ArrayBuffer]);
-  } catch {
-    // Logic-layer diagnostics never reach the user as text; the UI maps this to a translated
-    // string (`spec/constraints.md`).
-    post({ type: 'error' });
+  } catch (error) {
+    // Log inside the worker (its console feeds the same devtools panel) *and* forward the details,
+    // so the failure is visible whichever side you are looking at.
+    logUnexpectedError('compress worker failed', error);
+    post({
+      type: 'error',
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
   }
 };

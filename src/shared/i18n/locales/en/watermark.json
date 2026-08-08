@@ -2,5 +2,33 @@
   "name": "Watermark",
   "description": "Stamp text or an image across your pages.",
   "seoTitle": "Add a watermark to a PDF — free | PDFChill",
-  "seoDescription": "Stamp text or an image watermark onto every page of a PDF. Free, no uploads — everything runs in your browser."
+  "seoDescription": "Stamp text or an image watermark onto every page of a PDF. Free, no uploads — everything runs in your browser.",
+  "mode": {
+    "text": "Text",
+    "image": "Image"
+  },
+  "textLabel": "Watermark text",
+  "textPlaceholder": "e.g. CONFIDENTIAL",
+  "size": "Size",
+  "angle": "Angle",
+  "color": "Colour",
+  "opacity": "Opacity",
+  "chooseImage": "Choose a PNG or JPG",
+  "replaceImage": "Replace image",
+  "imageHint": "Drawn centred at 50% of the page width, aspect ratio preserved.",
+  "pages": "Pages",
+  "allPages": "All pages",
+  "pageRange": "Page range",
+  "from": "From page",
+  "to": "To page",
+  "invalidRange": "Enter a range between 1 and {{total}}, with the first page not after the last.",
+  "apply": "Apply watermark",
+  "update": "Update watermark",
+  "remove": "Remove watermark",
+  "applied": "Watermark applied. It is baked into every export — including after you merge, split or rotate.",
+  "preview": "Preview (page 1)",
+  "action": "Save watermarked PDF",
+  "errors": {
+    "unsupportedImage": "Only PNG and JPG images are supported: {{file}}"
+  }
 }

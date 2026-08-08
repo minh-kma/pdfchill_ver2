@@ -6,8 +6,9 @@ import { ErrorBanner } from '../../shared/components/ErrorBanner.tsx';
 import { FileDropzone } from '../../shared/components/FileDropzone.tsx';
 import { PreviewModal } from '../../shared/components/PreviewModal.tsx';
 import { useDragSensors } from '../../shared/components/dnd/useDragSensors.ts';
+import { toErrorKey } from '../../shared/lib/errorKeys.ts';
 import { downloadBlob } from '../../shared/lib/download.ts';
-import type { AppError } from '../../shared/state/useAddSources.ts';
+import type { AppError } from '../../shared/state/useAddSources.tsx';
 import type { ToolPageProps } from '../../toolRegistry.ts';
 import { ImageCard } from './ImageCard.tsx';
 import { ImageZoom } from './ImageZoom.tsx';
@@ -94,8 +95,8 @@ export function ImageToPdfTool({ tool }: ToolPageProps) {
         fileName: first.name,
         zip: await zip.generateAsync({ type: 'blob' }),
       });
-    } catch {
-      setError({ key: 'workspace:errors.generic' });
+    } catch (failure) {
+      setError({ key: toErrorKey(failure, 'image to pdf conversion') });
     } finally {
       setBusy(false);
     }

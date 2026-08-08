@@ -46,6 +46,20 @@ void i18n.use(initReactI18next).init({
   defaultNS: 'common',
   interpolation: { escapeValue: false }, // React already escapes.
   returnNull: false,
+
+  // Surface unresolvable keys instead of silently rendering the key string to the user.
+  //
+  // This exists because `ocr:result.summary` shipped broken: it was authored only as
+  // `summary_one`/`summary_other` but called without a `count`, so i18next could not select a
+  // plural form and rendered the literal text "result.summary". Nothing warned. A missing key is
+  // always a bug, so it is logged in every environment, not just dev.
+  saveMissing: true,
+  missingKeyHandler: (languages, namespace, key) => {
+    console.error(
+      `[PDFChill] i18n key did not resolve: "${namespace}:${key}" (${languages.join(', ')}). ` +
+        'If the key exists only as _one/_other, the call site must pass a `count`.',
+    );
+  },
 });
 
 export default i18n;

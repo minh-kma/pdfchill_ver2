@@ -1,3 +1,4 @@
+import { logUnexpectedError } from '../../../shared/lib/logError.ts';
 import type { CompressionLevel } from './compressLevels.ts';
 import type { CompressRequest, CompressResponse } from './compressWorker.ts';
 
@@ -39,7 +40,10 @@ export function runCompress(
         return;
       }
       if (message.type === 'error') {
-        finish(() => reject(new Error('compress failed')));
+        // Rebuild the worker's real error so the caller logs the actual cause, not a placeholder.
+        const error = new Error(message.message);
+        if (message.stack) error.stack = message.stack;
+        finish(() => reject(error));
         return;
       }
       finish(() =>
@@ -53,7 +57,11 @@ export function runCompress(
       );
     };
 
-    worker.onerror = () => finish(() => reject(new Error('compress worker crashed')));
+    worker.onerror = (event) => {
+      // A worker that fails to even load (bad module graph, missing chunk) surfaces here.
+      logUnexpectedError('compress worker crashed', event.message || event);
+      finish(() => reject(new Error(event.message || 'compress worker crashed')));
+    };
 
     // The input buffer is copied, not transferred: the caller keeps the original bytes for the
     // per-document floor comparison.

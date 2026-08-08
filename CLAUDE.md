@@ -8,9 +8,9 @@ duplicating their content here.
 PDFChill v2 is a from-scratch rewrite of pdfchill.online: a free PDF toolkit that runs entirely in
 the browser — no backend, no accounts, no file byte ever leaving the device. It is a
 registry-driven React SPA where `src/toolRegistry.ts` is the single source of truth per tool.
-**The rewrite is in progress: 5 of the 11 tools are implemented** (Merge, Split, Reorder, Delete
-pages, Rotate — all page-manipulation); the other six render a `ComingSoonTool` placeholder behind
-a fully working route. See [.claude/docs/tool-status.md](.claude/docs/tool-status.md).
+**All 11 tools are implemented**; `ComingSoonTool` is no longer referenced by the registry. Still
+outstanding before launch: prerendering + `sitemap.xml`, session autosave/recovery, and accounts.
+See [.claude/docs/tool-status.md](.claude/docs/tool-status.md).
 
 ## 2. Tech Stack
 
@@ -77,14 +77,24 @@ Violating any of these silently breaks something. The full list is
   file. `sources` is append-only; only `RESET` empties it.
 - **Nothing auto-downloads.** Every result goes through `PreviewModal` first. Split's zip is the
   one documented exception.
-- **Users never see `err.message`.** Throw a typed error, map it with `toErrorKey()` to a
-  translated string.
+- **Users never see `err.message`.** Throw a typed error, map it with `toErrorKey()` /
+  `toSecurityErrorKey()` to a translated string — and **always pass a context string**. Those
+  mappers are the logging chokepoint: unrecognised errors go to `console.error` with the real
+  object, recognised ones to `console.warn`. Never write a bare `catch {}` that shows a translated
+  message; that is how four flows once failed with an empty console.
 - **Only `LanguageSwitcher` writes the language preference** (`localStorage['pdfdemo:lang']` — a
   legacy key; renaming it drops every existing visitor's preference). Language detection is
   read-only. Never compare `i18n.language` with `===`; it can be `'vi-VN'`.
-- **qpdf-wasm module instances are single-use.** When Protect/Unlock/Compress land: cache the
-  *factory*, but create a fresh instance per invocation — `callMain()` calls Emscripten's `exit()`,
-  which permanently kills that instance. Do not "optimise" this into one shared instance.
+- **qpdf-wasm module instances are single-use.** `shared/lib/qpdf.ts`'s `runQpdf` is the only call
+  site; it creates a fresh instance per invocation because `callMain()` calls Emscripten's
+  `exit()`, which permanently kills that instance. Do not "optimise" this into one shared instance,
+  and do not invoke qpdf anywhere else.
+- **An encrypted upload is decrypted before it reaches the store.** Every upload path goes through
+  `useUnlockGate`, so a `SourceDoc` always holds plaintext. The unlock password is memory-only,
+  never persisted, cleared on Start Over.
+- **`copyPagesToPdf` bakes document marks.** A watermark is a `DocAnnotation` on the page plan, not
+  bytes produced by its own tool — that is what makes it survive a later merge/split/rotate. Never
+  add a second page-drawing path.
 - **Do not modify `spec/`.** It is the extracted behavioural spec, not implementation docs.
 
 ## 6. Additional Documentation

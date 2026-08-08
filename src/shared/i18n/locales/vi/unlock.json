@@ -2,5 +2,25 @@
   "name": "Gỡ mật khẩu",
   "description": "Gỡ mật khẩu khỏi tệp PDF mà bạn đã mở được.",
   "seoTitle": "Gỡ mật khẩu PDF — mở khóa miễn phí | PDFChill",
-  "seoDescription": "Gỡ mật khẩu khỏi tệp PDF mà bạn đã biết mật khẩu. Miễn phí, không tải lên."
+  "seoDescription": "Gỡ mật khẩu khỏi tệp PDF mà bạn đã biết mật khẩu. Miễn phí, không tải lên.",
+  "uploadTitle": "Chọn tệp PDF có mật khẩu",
+  "uploadSubtitle": "hoặc thả vào đây — tệp không bao giờ rời khỏi thiết bị của bạn",
+  "checking": "Đang kiểm tra tệp…",
+  "needsPassword": "Tệp PDF này cần mật khẩu để mở. Hãy nhập bên dưới.",
+  "ownerOnly": "Tệp PDF này có giới hạn quyền nhưng không có mật khẩu mở. Để trống ô và chọn Gỡ mật khẩu.",
+  "ownerOnlyPlaceholder": "Để trống",
+  "action": "Gỡ mật khẩu",
+  "prompt": {
+    "title": "Tệp PDF này được bảo vệ bằng mật khẩu",
+    "label": "Mật khẩu",
+    "submit": "Mở khóa",
+    "skip": "Bỏ qua tệp này",
+    "show": "Hiện",
+    "hide": "Ẩn",
+    "wrong": "Mật khẩu không đúng. Hãy thử lại."
+  },
+  "errors": {
+    "notEncrypted": "“{{file}}” không được bảo vệ bằng mật khẩu — không có gì để gỡ.",
+    "wrongPassword": "Mật khẩu không đúng. Hãy thử lại."
+  }
 }
