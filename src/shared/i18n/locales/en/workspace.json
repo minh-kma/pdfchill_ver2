@@ -1,0 +1,48 @@
+{
+  "upload": {
+    "title": "Select a PDF file",
+    "addTitle": "Add another file",
+    "subtitle": "or drop it here — the file never leaves your device",
+    "subtitleMulti": "or drop them here — files never leave your device",
+    "button": "Choose file",
+    "reading": "Reading…"
+  },
+  "header": {
+    "summary": "{{pages}} from {{files}}",
+    "pages_one": "{{count}} page",
+    "pages_other": "{{count}} pages",
+    "files_one": "{{count}} file",
+    "files_other": "{{count}} files"
+  },
+  "actions": {
+    "rotateAll": "Rotate all",
+    "undo": "Undo",
+    "redo": "Redo",
+    "startOver": "Start over",
+    "working": "Working…"
+  },
+  "page": {
+    "label": "Page {{number}}",
+    "rotate": "Rotate 90°",
+    "delete": "Delete page",
+    "enlarge": "Enlarge"
+  },
+  "zoom": {
+    "in": "Zoom in",
+    "out": "Zoom out",
+    "label": "Zoom level, percent"
+  },
+  "preview": {
+    "title": "Preview",
+    "subtitle": "Check the result, then download it.",
+    "download": "Download",
+    "close": "Close"
+  },
+  "errors": {
+    "invalidPdf": "Couldn’t read “{{file}}”. It may be damaged or not a PDF.",
+    "encrypted": "“{{file}}” is password-protected. Remove its password first, then try again.",
+    "emptyPlan": "There are no pages left to save.",
+    "generic": "Something went wrong. Please try again.",
+    "dismiss": "Dismiss"
+  }
+}

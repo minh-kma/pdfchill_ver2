@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      Single SPA entry point. <title>, <meta name="description">, <html lang>, canonical and
+      hreflang tags are all owned at runtime by shared/seo/useDocumentMeta.ts, which reads them
+      from the same per-tool i18n namespace the UI reads. The old app authored this copy twice
+      (static <head> + seo.json) and they drifted — SPEC.md §7 pain point #2. Do not hand-write
+      title/description here; a prerender step (later) should render these tags from the same hook.
+    -->
+    <title>PDFChill</title>
+    <meta name="description" content="Free browser-based PDF tools." />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "Split PDF",
+  "description": "Cut one PDF into several files at the page breaks you pick.",
+  "seoTitle": "Split a PDF into multiple files — free | PDFChill",
+  "seoDescription": "Split a PDF into separate documents at the pages you choose. Free, no uploads — everything runs in your browser.",
+  "mode": {
+    "ranges": "Split after pages",
+    "pages": "Every page separately"
+  },
+  "splitAfterLabel": "Split after page numbers",
+  "splitAfterPlaceholder": "e.g. 3, 7",
+  "splitAfterHint": "Comma-separated. This document has {{total}} pages.",
+  "pagesHint_one": "Produces {{count}} file, one per page.",
+  "pagesHint_other": "Produces {{count}} files, one per page.",
+  "ignored": "Ignored (out of range): {{values}}",
+  "resultCount_one": "Result: {{count}} file.",
+  "resultCount_other": "Result: {{count}} files.",
+  "action": "Split and download .zip"
+}

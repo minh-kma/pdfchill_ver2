@@ -1,0 +1,17 @@
+{
+  "name": "Tách PDF",
+  "description": "Cắt một tệp PDF thành nhiều tệp tại các trang bạn chọn.",
+  "seoTitle": "Tách PDF thành nhiều tệp — miễn phí | PDFChill",
+  "seoDescription": "Tách một tệp PDF thành nhiều tài liệu tại các trang bạn chọn. Miễn phí, không tải lên.",
+  "mode": {
+    "ranges": "Tách sau các trang",
+    "pages": "Mỗi trang một tệp"
+  },
+  "splitAfterLabel": "Tách sau các số trang",
+  "splitAfterPlaceholder": "ví dụ 3, 7",
+  "splitAfterHint": "Ngăn cách bằng dấu phẩy. Tài liệu này có {{total}} trang.",
+  "pagesHint_other": "Tạo ra {{count}} tệp, mỗi trang một tệp.",
+  "ignored": "Đã bỏ qua (ngoài phạm vi): {{values}}",
+  "resultCount_other": "Kết quả: {{count}} tệp.",
+  "action": "Tách và tải .zip"
+}

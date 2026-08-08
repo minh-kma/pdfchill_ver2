@@ -1,0 +1,19 @@
+{
+  "appName": "PDFChill",
+  "comingSoon": "Sắp ra mắt — {{tool}}",
+  "categories": {
+    "organize": "Sắp xếp PDF",
+    "optimize": "Tối ưu PDF",
+    "convert": "Chuyển đổi PDF",
+    "edit": "Chỉnh sửa PDF",
+    "security": "Bảo mật PDF"
+  },
+  "notFound": {
+    "title": "Không tìm thấy trang",
+    "body": "Đường dẫn này không khớp với công cụ nào của PDFChill.",
+    "cta": "Quay lại tất cả công cụ"
+  },
+  "footer": {
+    "tagline": "Mọi tệp đều được xử lý ngay trong trình duyệt. Không có gì được tải lên."
+  }
+}

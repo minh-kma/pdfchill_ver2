@@ -1,0 +1,46 @@
+{
+  "upload": {
+    "title": "Chọn một tệp PDF",
+    "addTitle": "Thêm tệp khác",
+    "subtitle": "hoặc thả vào đây — tệp không bao giờ rời khỏi thiết bị của bạn",
+    "subtitleMulti": "hoặc thả vào đây — các tệp không bao giờ rời khỏi thiết bị của bạn",
+    "button": "Chọn tệp",
+    "reading": "Đang đọc…"
+  },
+  "header": {
+    "summary": "{{pages}} từ {{files}}",
+    "pages_other": "{{count}} trang",
+    "files_other": "{{count}} tệp"
+  },
+  "actions": {
+    "rotateAll": "Xoay tất cả",
+    "undo": "Hoàn tác",
+    "redo": "Làm lại",
+    "startOver": "Bắt đầu lại",
+    "working": "Đang xử lý…"
+  },
+  "page": {
+    "label": "Trang {{number}}",
+    "rotate": "Xoay 90°",
+    "delete": "Xóa trang",
+    "enlarge": "Phóng to"
+  },
+  "zoom": {
+    "in": "Phóng to",
+    "out": "Thu nhỏ",
+    "label": "Mức thu phóng, phần trăm"
+  },
+  "preview": {
+    "title": "Xem trước",
+    "subtitle": "Kiểm tra kết quả rồi tải xuống.",
+    "download": "Tải xuống",
+    "close": "Đóng"
+  },
+  "errors": {
+    "invalidPdf": "Không đọc được “{{file}}”. Tệp có thể bị hỏng hoặc không phải PDF.",
+    "encrypted": "“{{file}}” được bảo vệ bằng mật khẩu. Hãy gỡ mật khẩu trước rồi thử lại.",
+    "emptyPlan": "Không còn trang nào để lưu.",
+    "generic": "Đã xảy ra lỗi. Vui lòng thử lại.",
+    "dismiss": "Bỏ qua"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "appName": "PDFChill",
+  "comingSoon": "Coming soon — {{tool}}",
+  "categories": {
+    "organize": "Organize PDF",
+    "optimize": "Optimize PDF",
+    "convert": "Convert PDF",
+    "edit": "Edit PDF",
+    "security": "PDF Security"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "That URL doesn't match any PDFChill tool.",
+    "cta": "Back to all tools"
+  },
+  "footer": {
+    "tagline": "Every file is processed in your browser. Nothing is uploaded."
+  }
+}
