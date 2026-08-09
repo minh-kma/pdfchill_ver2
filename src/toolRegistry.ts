@@ -2,7 +2,7 @@
  * THE tool registry — the single source of truth for every tool's identity.
  *
  * Everything tool-shaped in the app is generated from `TOOLS` / `CATEGORIES` below:
- *   - the routing table            -> src/shared/router/Router.tsx
+ *   - the routing table            -> src/App.tsx (via src/shared/router/useRoute.ts)
  *   - the "All PDF Tools" dropdown -> src/shared/components/AllToolsMenu.tsx
  *   - the homepage filter tabs     -> src/pages/HomePage.tsx
  *   - the homepage card grid       -> src/pages/HomePage.tsx

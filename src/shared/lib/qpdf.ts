@@ -6,7 +6,8 @@
  * success/failure is detected had to be applied in three places with nothing enforcing they
  * matched. Call sites here are reduced to "what args do I pass".
  *
- * Compress's structural pass uses it today; Protect and Unlock will use it unchanged.
+ * Three call sites use it, unchanged: Compress's structural pass (`optimizeStructure.ts`),
+ * Add password (`protectPdf.ts`) and Remove password (`pdfUnlock.ts`).
  */
 
 // Emitted as a same-origin asset, not fetched from a CDN (`spec/constraints.md`).

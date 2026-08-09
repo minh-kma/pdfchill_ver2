@@ -60,9 +60,14 @@ Vietnamese routes are the same slugs under `/vi/` — e.g. `/vi/merge-pdf/`.
 
 ## What exists for the single-file transforms
 
-- `src/tools/shared/SingleFileToolShell.tsx` — one-file picker plus registry-driven heading, used
-  by all five. Encrypted input is decrypted through the shared unlock gate before the tool body
-  sees it; `acceptEncrypted` opts out, and only Unlock sets it.
+- `src/tools/shared/SingleFileToolShell.tsx` — one-file picker plus registry-driven heading, used by
+  **four** of the five: Compress, OCR, Add password, Remove password. Encrypted input is decrypted
+  through the shared unlock gate before the tool body sees it; `acceptEncrypted` opts out, and only
+  Unlock sets it.
+  **Image to PDF deliberately does not use it** — that is not an oversight. It ingests images, not a
+  PDF, so a one-file picker and the unlock gate are both inapplicable; it builds its own dropzone and
+  sortable grid, sharing only the generic drag/zoom pieces (`useDragSensors`, `ZoomModalChrome`,
+  `ZoomStepper`).
 - **Compress** (`src/tools/optimize/compress/`) — both phases run in a Web Worker
   (`compressWorker.ts`): lossy image recompression via OffscreenCanvas, then the always-run
   lossless qpdf structural pass. All three "never bigger" floors are in place; `pickCompressResult`

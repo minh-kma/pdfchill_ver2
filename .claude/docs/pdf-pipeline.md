@@ -51,12 +51,15 @@ Failure is typed, never a raw message:
   `/Encrypt` trailer marker.
 - `InvalidPdfError` — pdf-lib failed to load and no marker, or the file has zero pages.
 
-`hasEncryptMarker()` is exported for the future Unlock tool. It is used only to *explain* a load
-failure, never to reject a file that loaded fine: those literal bytes could occur inside an ordinary
-content stream, and a false reject is worse than a vague error. The authoritative detection layer
-(pdf.js's `PasswordException`, per `spec/edge-cases.md`) belongs to Unlock when it is built.
+`hasEncryptMarker()` is exported and has two other consumers: `probeEncryption()` in
+`shared/pdf/pdfRender.ts` (Unlock's detection), and `tools/security/protectPdf.ts`, which uses it to
+reject an already-encrypted input before qpdf is invoked. Inside `readSource` it is used only to
+*explain* a load failure, never to reject a file that loaded fine: those literal bytes could occur
+inside an ordinary content stream, and a false reject is worse than a vague error. The authoritative
+detection layer is pdf.js's `PasswordException` (per `spec/edge-cases.md`), which is the other half
+of `probeEncryption()`.
 
-`useAddSources()` (`shared/state/useAddSources.ts`) wraps this for the UI: one `ADD_SOURCE` per
+`useAddSources()` (`shared/state/useAddSources.tsx`) wraps this for the UI: one `ADD_SOURCE` per
 file so each is independently undoable, and a file that fails to parse is reported while the rest
 of the batch continues.
 
@@ -177,7 +180,8 @@ time. Node harnesses do **not** catch it: `qpdf.mjs` branches on `globalThis.pro
 Node it takes a `require()` path that works and the browser branch is never executed. Any test that
 must cover this has to run with `process` absent.
 
-Compress uses it today; Protect and Unlock will use it unchanged.
+Three call sites use it, unchanged: `compress/optimizeStructure.ts` (the lossless structural pass),
+`security/protectPdf.ts` (`--encrypt … 256`) and `security/pdfUnlock.ts` (`--decrypt`).
 
 ---
 
@@ -225,10 +229,16 @@ renders an `<img>`.
 
 `SplitTool.tsx` is the only one with its own panel, because it has settings.
 
-`src/tools/shared/SingleFileToolShell.tsx` is the equivalent for the single-purpose transforms
-(Compress, OCR): registry-driven heading, a one-file picker, then the tool's own config/running UI.
-It is deliberately **not** wired to the session store — those tools have no page plan and nothing
-to undo, and a user's in-progress merge session is not their input.
+`src/tools/shared/SingleFileToolShell.tsx` is the equivalent for the single-purpose transforms.
+Four tools use it — **Compress, OCR, Protect and Unlock**: registry-driven heading, a one-file
+picker, then the tool's own config/running UI. It is deliberately **not** wired to the session store
+— those tools have no page plan and nothing to undo, and a user's in-progress merge session is not
+their input. Picked bytes go through the unlock gate first; `acceptEncrypted` opts out, and only
+`UnlockTool` sets it.
+
+Image to PDF is the one transform that does **not** use this shell: it ingests images rather than a
+PDF, so a one-file picker and the unlock gate both fail to apply. It builds its own `FileDropzone` +
+sortable grid, sharing the *generic* drag/zoom pieces below rather than the shell.
 
 ### Compress specifics (`src/tools/optimize/compress/`)
 
@@ -259,6 +269,11 @@ a cancelled save dialog (`AbortError`) means "do nothing", never "fall back".
 
 Split is the one documented exception (`spec/features.md` §1.2): its result is a zip of N PDFs
 (jszip, dynamically imported), which has no single document to preview, so it downloads directly.
+
+Image to PDF's separate-files mode produces a zip too (`spec/features.md` §1.11), but it is **not** a
+second exception: it still opens `PreviewModal`, previewing the first PDF and passing the zip to the
+modal's `notice` + `onDownload` props. A zip result does not by itself license a direct download —
+Split's does only because there is nothing previewable to show.
 
 Errors reaching the UI are always translated. Logic modules throw typed errors
 (`InvalidPdfError`, `EncryptedPdfError`, `EmptyPlanError`); `toErrorKey()` in

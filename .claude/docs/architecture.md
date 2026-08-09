@@ -132,29 +132,72 @@ src/
   pages/
     HomePage.tsx               ← hero + client-side filter tabs + card grid (from registry)
     NotFoundPage.tsx
+  types/
+    qpdf-wasm.d.ts             ← types the CJS qpdf.js import (see shared/lib/qpdf.ts)
   tools/
-    ComingSoonTool.tsx         ← placeholder for the six unimplemented tools
+    ComingSoonTool.tsx         ← unused scaffolding; kept as the placeholder for a future tool #12
+    shared/
+      SingleFileToolShell.tsx  ← one-file picker + heading, for the single-file transforms
     organize/
       OrganizeToolShell.tsx    ← heading + file input + Workspace + the tool's action area
       BuildAction.tsx          ← assemble the plan → PreviewModal (Merge/Reorder/Delete/Rotate)
       MergeTool.tsx  SplitTool.tsx  ReorderTool.tsx  DeletePagesTool.tsx  RotateTool.tsx
+    optimize/
+      compress/
+        CompressTool.tsx       ← the screen; both phases run in the worker
+        compressWorker.ts      ← Web Worker entry (needs vite.config's worker.format: 'es')
+        runCompress.ts         ← spawns + talks to the worker
+        compressPipeline.ts    ← phase order + the per-stage "never bigger" floor
+        recompressImages.ts    ← phase 1: OffscreenCanvas image recompression, per-image floor
+        optimizeStructure.ts   ← phase 2: the always-run lossless qpdf pass
+        pickCompressResult.ts  ← the per-document floor. Pure, React-free, testable.
+        compressLevels.ts      ← the quality presets
+      ocr/
+        OcrTool.tsx
+        ocrDocument.ts         ← recognition only; never writes to a PDF
+        bakeOcrTextLayer.ts    ← writes the invisible text layer; never runs Tesseract
+    convert/
+      ImageToPdfTool.tsx       ← its own dropzone + grid; NOT SingleFileToolShell
+      imagesToPdf.ts           ← buildMergedPdf / buildSeparatePdfs + layout options
+      useImageList.ts          ← staged-image state, local to the screen (not the store)
+      ImageCard.tsx  ImageZoom.tsx
+    edit/
+      WatermarkTool.tsx        ← dispatches a DocAnnotation; produces no bytes itself
+      WatermarkPreview.tsx     ← live preview, sharing watermarkGeometry.ts with the bake
+    security/
+      ProtectTool.tsx  UnlockTool.tsx
+      protectPdf.ts            ← qpdf --encrypt (AES-256), via runQpdf
+      pdfUnlock.ts             ← qpdf --decrypt, via runQpdf
+      securityErrors.ts        ← typed errors → toSecurityErrorKey()
   shared/
     lib/
       routes.ts                ← THE path parser: parseLocation / buildPath. React-free.
       language.ts              ← SUPPORTED_LANGUAGES, toSupportedLanguage, preference storage
       pdfCore.ts               ← THE assembly pipeline: readSource / copyPagesToPdf / splitPdf
+      annotationBake.ts        ← THE page-drawing path, called only from copyPagesToPdf
+      watermarkGeometry.ts     ← the one watermark placement formula (bake + live preview)
+      geometry.ts              ← toPdfRect: the one normalized-rect ↔ PDF-rect conversion
+      qpdf.ts                  ← THE qpdf-wasm call site. Fresh instance per call.
       splitRanges.ts           ← pure "split after pages" parsing (spec/features.md §1.2)
       rotation.ts              ← normalizeRotation, dependency-free
       download.ts              ← savePdf (File System Access + fallback), downloadBlob
       errorKeys.ts             ← typed error class → translation key
+      logError.ts              ← the logging chokepoint used by the error mappers
+      color.ts                 ← hex ↔ pdf-lib rgb
+      hash.ts                  ← FNV-1a content hash, for asset identity
+      formatBytes.ts           ← human-readable sizes
       ids.ts                   ← session-local id generation
     state/
-      types.ts                 ← SourceDoc, PageItem, EditSnapshot, AppState
+      types.ts                 ← SourceDoc, PageItem, DocAnnotation, Asset, EditSnapshot, AppState
       store.tsx                ← immer reducer + undo/redo history + context
       useUndoRedoShortcuts.ts  ← global Ctrl/Cmd+Z / Shift+Z / Ctrl+Y
-      useAddSources.ts         ← file → readSource → ADD_SOURCE, with translated errors
+      useAddSources.tsx        ← file → readSource → ADD_SOURCE, with translated errors
+      useUnlockGate.tsx        ← ensureDecrypted: sits in EVERY upload path
+      sessionPassword.ts       ← the unlock password. Memory only, outside AppState.
+      appError.ts              ← the AppError shape shown by ErrorBanner
     pdf/
       pdfRender.ts             ← pdf.js: display only. Doc cache + release + render queue.
+                                 Also probeEncryption() — the authoritative encryption detector.
     router/
       navigation.ts            ← history push + subscribe (no URL interpretation)
       useRoute.ts              ← URL → { home | tool | notFound }
@@ -173,8 +216,13 @@ src/
       Footer.tsx
       FileDropzone.tsx         ← drag-drop / click-to-browse PDF input
       PreviewModal.tsx         ← the mandatory review step before any download
+      PasswordPrompt.tsx       ← the unlock gate's prompt (retries + Skip)
+      ZoomModalChrome.tsx      ← Escape-to-close, scroll-lock, backdrop-click (both zoom modals)
+      ZoomStepper.tsx          ← 20–300% in 10% steps (both zoom modals)
       ErrorBanner.tsx
       icons.tsx                ← one icon per tool + chrome icons
+      dnd/
+        useDragSensors.ts      ← THE sensor config, shared by both drag grids
       workspace/
         Workspace.tsx          ← THE page grid: dnd reorder, toolbar, undo/redo buttons
         PageThumb.tsx          ← sortable card + per-page rotate/delete/enlarge
@@ -215,7 +263,7 @@ Break these and something silently drifts:
 
 ## 5. Deliberately not built yet
 
-Compress, OCR, Image to PDF, Watermark, Add/Remove password (still `ComingSoonTool`); session
+All 11 tools are built ([tool-status.md](tool-status.md)). Still outstanding: session
 autosave and recovery; prerendering + `sitemap.xml`; ads; accounts. Nothing above assumes their
 absence — a login feature, for instance, would slot into `AppBar` without touching the registry,
 and `StoreProvider` already takes an `initial` state for session recovery to hydrate.

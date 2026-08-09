@@ -23,12 +23,15 @@ See [.claude/docs/tool-status.md](.claude/docs/tool-status.md).
 | PDF rendering | `pdfjs-dist` 6 — display only, never writes output |
 | State | `immer` 11 + `useReducer` + context (no Redux/Zustand) |
 | Drag & drop | `@dnd-kit/core` 6, `@dnd-kit/sortable` 10 |
-| Zip | `jszip` 3 (Split output only) |
+| Zip | `jszip` 3 (Split output, and Image to PDF's separate-files mode) |
+| Encryption / structure | `@jspawn/qpdf-wasm` 0.0.2 — via `shared/lib/qpdf.ts` only (Compress, Protect, Unlock) |
+| OCR | `tesseract.js` 7 — recognition only; it never writes to a PDF |
 | i18n | `i18next` 25 + `react-i18next` 16 — English + Vietnamese |
 | Routing | Hand-rolled, ~100 lines. **No React Router** — see constraints below. |
 
-Not present, despite appearing in the spec: **qpdf-wasm** and **tesseract.js**. They arrive with
-Protect/Unlock/Compress and OCR respectively. Do not assume them.
+`qpdf-wasm` and `tesseract.js` are installed and wired end-to-end. Both are dynamically imported,
+so neither lands in the homepage bundle — see
+[.claude/docs/pdf-pipeline.md](.claude/docs/pdf-pipeline.md).
 
 ## 3. Dev Commands
 
@@ -76,7 +79,9 @@ Violating any of these silently breaks something. The full list is
 - **Deleting a page never drops its `SourceDoc`** — undo restores the bytes without re-reading the
   file. `sources` is append-only; only `RESET` empties it.
 - **Nothing auto-downloads.** Every result goes through `PreviewModal` first. Split's zip is the
-  one documented exception.
+  one documented exception. Image to PDF's separate-files mode also produces a zip, but it is *not*
+  an exception — it goes through `PreviewModal` (previewing the first PDF, downloading the whole
+  zip via the modal's `onDownload`).
 - **Users never see `err.message`.** Throw a typed error, map it with `toErrorKey()` /
   `toSecurityErrorKey()` to a translated string — and **always pass a context string**. Those
   mappers are the logging chokepoint: unrecognised errors go to `console.error` with the real
