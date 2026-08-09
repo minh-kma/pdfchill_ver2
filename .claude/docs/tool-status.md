@@ -102,7 +102,8 @@ password lives in `shared/state/sessionPassword.ts` — memory only, cleared on 
 ## What is missing repo-wide
 
 Every tool is built. Still absent, and not to be assumed present: session autosave / recovery
-(IndexedDB), prerendering + `sitemap.xml`, ad units, accounts.
+(IndexedDB), ad units, accounts. Prerendering + `sitemap.xml` is now built
+(`scripts/prerender.mjs`, wired as `postbuild`).
 
 `StoreProvider` already accepts an `initial` state, which is the hydration point session recovery
 will use.

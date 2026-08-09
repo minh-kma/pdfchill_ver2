@@ -122,8 +122,32 @@ deliberately carries no per-page copy. The old app authored each page's title an
 duplication shipped a production bug and is `spec/maintainability.md` pain point #2.
 **Do not reintroduce hand-written `<head>` copy.**
 
-**Not built yet, and needed before launch:** this is a client-side SPA with one `index.html`, so
-crawlers get the placeholder head until JS runs. A prerender step must generate one HTML file per
-(tool × language) — plus `sitemap.xml` — by iterating `TOOLS` × `SUPPORTED_LANGUAGES` and rendering
-these same i18n keys. `getServerLocationSnapshot()` exists for exactly that: the router resolves a
-route with no live `window`, so a prerenderer drives the real router rather than a copy of it.
+### Prerendering — `scripts/prerender.mjs` (built)
+
+This is a client-side SPA with one `index.html`, so crawlers would get the placeholder head until JS
+runs. A `postbuild` step therefore emits one static HTML file per URL: `routeInventory()` iterates
+`TOOLS` × `SUPPORTED_LANGUAGES`, giving **24 files** (11 tools + homepage, × en/vi) plus
+`sitemap.xml` from the same iteration.
+
+The tag computation is **not duplicated** in the script. `buildPageMeta()` in `shared/seo/pageMeta.ts`
+is the one function that maps a route to its tags; `useDocumentMeta` calls it at runtime and the
+prerenderer calls it at build time, both resolving the same i18n keys through the app's own i18next
+instance (`getFixedT(lang)`). That is the whole reason `pageMeta.ts` exists as a separate module —
+a build script re-deriving "tool → seoTitleKey" is pain point #2 reappearing.
+
+Route resolution reuses the real pipeline: the script assigns `globalThis.location`, then goes
+`getServerLocationSnapshot()` → `parseLocation()` → `findToolBySlug()`. There is no second matcher.
+
+Only the `<head>` is generated — the body stays `<div id="root">` and every file loads the same one
+JS/CSS bundle, so the page still boots into the full SPA. The app is **not** server-rendered:
+`main.tsx` uses `createRoot()`, not `hydrateRoot()`, and emitting server markup would mean changing
+how the live app boots. Because the prerendered tags use the same selectors `useDocumentMeta`
+queries, the runtime hook *updates* them in place rather than appending duplicates.
+
+Absolute URLs need an origin a static file cannot know: `PDFCHILL_SITE_ORIGIN` env var, defaulting
+to `https://pdfchill.online`. Set it if the deploy origin differs, or canonicals will point at the
+wrong host.
+
+Every generated page is asserted before it is written (tags applied, comments balanced, bundle and
+`#root` still present) — a regex-templated `<head>` fails silently otherwise, which it did once
+during development.

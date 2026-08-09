@@ -124,6 +124,8 @@ dropdown order), and add `categories.<id>` to `locales/en/common.json` and
 ## 3. File map
 
 ```
+scripts/
+  prerender.mjs                ← postbuild: 24 static HTML files + sitemap.xml, from the registry
 src/
   toolRegistry.ts              ← THE registry: 11 rows, categories, derived lookups
   App.tsx                      ← the entire routing table (home / registry entry / not-found)
@@ -207,7 +209,9 @@ src/
       detectLanguage.ts        ← path → localStorage → navigator → en
       useLanguage.ts           ← the only sanctioned reader of the active language
       locales/{en,vi}/*.json   ← one file per tool (id.json) + common / nav / home / workspace
-    seo/useDocumentMeta.ts
+    seo/
+      pageMeta.ts              ← THE route → SEO tags computation. Runtime + prerender both call it.
+      useDocumentMeta.ts       ← applies pageMeta's result to the live document.head
     components/
       AppBar.tsx               ← logo + the one dropdown + language links
       AllToolsMenu.tsx         ← "All PDF Tools", grouped by category, from registry
@@ -264,6 +268,7 @@ Break these and something silently drifts:
 ## 5. Deliberately not built yet
 
 All 11 tools are built ([tool-status.md](tool-status.md)). Still outstanding: session
-autosave and recovery; prerendering + `sitemap.xml`; ads; accounts. Nothing above assumes their
+autosave and recovery; ads; accounts. (Prerendering + `sitemap.xml` is built — see
+[routing-i18n.md](routing-i18n.md) §4.) Nothing above assumes their
 absence — a login feature, for instance, would slot into `AppBar` without touching the registry,
 and `StoreProvider` already takes an `initial` state for session recovery to hydrate.

@@ -4,11 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!--
-      Single SPA entry point. <title>, <meta name="description">, <html lang>, canonical and
-      hreflang tags are all owned at runtime by shared/seo/useDocumentMeta.ts, which reads them
-      from the same per-tool i18n namespace the UI reads. The old app authored this copy twice
-      (static <head> + seo.json) and they drifted — SPEC.md §7 pain point #2. Do not hand-write
-      title/description here; a prerender step (later) should render these tags from the same hook.
+      Single SPA entry point, and the template scripts/prerender.mjs rewrites per route.
+
+      The per-page SEO tags (page title, description, html lang, canonical, hreflang) are computed
+      in exactly one place — buildPageMeta() in shared/seo/pageMeta.ts — and applied twice: by
+      shared/seo/useDocumentMeta.ts at runtime, and by scripts/prerender.mjs at build time. The old
+      app authored that copy twice by hand (static head + seo.json) and the two drifted, which
+      shipped a production bug — SPEC.md §7 pain point #2. Do not hand-write per-page title or
+      description here or in the build script.
+
+      The tags below are placeholders for the dev server only; every file in dist/ gets real ones.
+      Note the prerenderer strips these comments from its output, partly because a comment naming
+      those tags literally would collide with its own tag rewriting.
     -->
     <title>PDFChill</title>
     <meta name="description" content="Free browser-based PDF tools." />
