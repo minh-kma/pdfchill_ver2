@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { savePdf, toBlob } from '../lib/download.ts';
+import { CheckIcon } from './icons.tsx';
 
 export interface PreviewModalProps {
   readonly bytes: Uint8Array;
@@ -10,10 +12,15 @@ export interface PreviewModalProps {
    * Overrides what the Download button saves. Images to PDF with "merge" off uses this: the
    * preview shows the first PDF as a stand-in, but the download is the whole zip
    * (`spec/features.md` §1.11). The review-before-download rule still holds either way.
+   *
+   * Return `false` to signal the download did not actually happen (a cancelled save dialog), so the
+   * button does not switch to its done state. `void`/`undefined` counts as completed.
    */
-  readonly onDownload?: () => void | Promise<void>;
+  readonly onDownload?: () => void | boolean | Promise<void | boolean>;
   /** i18n key for the Download button when `onDownload` replaces the default save. */
   readonly downloadLabelKey?: string;
+  /** i18n key for the done state, when `downloadLabelKey` overrides the default wording. */
+  readonly downloadedLabelKey?: string;
   /** Banner shown above the iframe — used when the previewed bytes are only a stand-in. */
   readonly notice?: string;
   /**
@@ -37,12 +44,19 @@ export function PreviewModal({
   onClose,
   onDownload,
   downloadLabelKey,
+  downloadedLabelKey,
   notice,
   overlay,
 }: PreviewModalProps) {
   const { t } = useTranslation();
   const [url, setUrl] = useState<string>();
   const [saving, setSaving] = useState(false);
+  /**
+   * Set only once a download genuinely completed, and never cleared on a timer. The modal unmounts
+   * when it is closed, so reopening it (a fresh result, a new file, Start Over) is what resets this
+   * — exactly the "surrounding state actually reset" rule, with no auto re-enable.
+   */
+  const [done, setDone] = useState(false);
 
   useEffect(() => {
     const objectUrl = URL.createObjectURL(toBlob(bytes, 'application/pdf'));
@@ -65,13 +79,26 @@ export function PreviewModal({
   async function handleDownload() {
     setSaving(true);
     try {
-      await (onDownload ? onDownload() : savePdf(bytes, fileName));
+      // `savePdf` resolves false when the user cancels the save dialog; a custom `onDownload` may
+      // do the same. Anything else (including a plain void return) means the file was delivered.
+      const completed = await (onDownload ? onDownload() : savePdf(bytes, fileName));
+      if (completed !== false) setDone(true);
     } finally {
       setSaving(false);
     }
   }
 
-  return (
+  /*
+   * Portalled to <body> deliberately.
+   *
+   * Tools render this from inside `OrganizeToolShell`'s action panel, which is `position: sticky` —
+   * and sticky creates a stacking context. Left in place, the modal's `z-50` would be scoped to that
+   * panel and the `z-40` AppBar would paint over it, swallowing clicks on Download. Same failure
+   * family as architecture.md invariant #8 (a `backdrop-blur` ancestor trapping `position: fixed`
+   * children). A portal puts the modal back in the root stacking context, where its z-index means
+   * what it says.
+   */
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
@@ -98,10 +125,14 @@ export function PreviewModal({
             <button
               type="button"
               onClick={() => void handleDownload()}
-              disabled={saving}
-              className="rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:opacity-60"
+              // Stays disabled once done — no timer re-enables it.
+              disabled={saving || done}
+              className="flex items-center gap-1.5 rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:opacity-60"
             >
-              {t(downloadLabelKey ?? 'workspace:preview.download')}
+              {done && <CheckIcon className="size-4" />}
+              {done
+                ? t(downloadedLabelKey ?? 'workspace:preview.downloaded')
+                : t(downloadLabelKey ?? 'workspace:preview.download')}
             </button>
           </div>
         </div>
@@ -118,6 +149,7 @@ export function PreviewModal({
           url && <iframe src={url} title={fileName} className="min-h-0 flex-1 bg-slate-100" />
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

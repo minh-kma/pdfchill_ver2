@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ErrorBanner } from '../../shared/components/ErrorBanner.tsx';
 import { FileDropzone } from '../../shared/components/FileDropzone.tsx';
 import { Workspace } from '../../shared/components/workspace/Workspace.tsx';
+import { WorkspacePreviewProvider } from '../../shared/components/workspace/workspacePreview.tsx';
 import { useStore } from '../../shared/state/store.tsx';
 import { useAddSources } from '../../shared/state/useAddSources.tsx';
 import type { ToolDefinition } from '../../toolRegistry.ts';
@@ -44,7 +45,8 @@ export function OrganizeToolShell({
   const hasPages = state.pages.length > 0;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
+    /* Wider than before: the layout below now puts the action panel beside the grid, not under it. */
+    <div className="mx-auto max-w-7xl px-4 py-10">
       <header className="mb-6">
         {/* Title and description come from the registry entry — never hardcoded per tool. */}
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">{t(tool.nameKey)}</h1>
@@ -68,10 +70,29 @@ export function OrganizeToolShell({
       )}
 
       {hasPages && (
-        <>
-          <Workspace />
-          <div className="mt-6">{children}</div>
-        </>
+        /*
+         * Two columns from `lg` up: the thumbnail grid scrolls with the page while the tool's
+         * action area stays put beside it. Below `lg` this collapses to the previous stacked
+         * layout (grid, then actions underneath) — at tablet width a 360px panel would leave the
+         * grid too narrow to show more than one or two thumbnails.
+         *
+         * `sticky`, not `fixed` + an inner-scrolling grid: the grid is a dnd-kit drag surface, and
+         * putting it in its own scroll container breaks drag auto-scroll and adds a second
+         * scrollbar. Sticky gives the same "always reachable" result using the page's own scroll.
+         *
+         * `items-start` is load-bearing — a stretched grid item is full-height, which leaves
+         * `sticky` nothing to travel within.
+         */
+        /* The provider wraps both columns: the panel (a sibling of the grid) publishes a live
+           preview mark into it, and the grid reads it. See workspacePreview.tsx. */
+        <WorkspacePreviewProvider>
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
+            <Workspace />
+            <aside className="lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)] lg:overflow-y-auto">
+              {children}
+            </aside>
+          </div>
+        </WorkspacePreviewProvider>
       )}
 
       {/* An encrypted upload is decrypted here, before it can reach the store. */}

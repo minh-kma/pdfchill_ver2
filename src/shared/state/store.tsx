@@ -234,7 +234,11 @@ export function StoreProvider({
   initial = initialState,
 }: {
   children: ReactNode;
-  /** Hydration point — used by tests now, and by session recovery in a later step. */
+  /**
+   * Hydration point. Session recovery uses it: `App.tsx` remounts this provider under a new `key`
+   * with the restored state, so `useReducer` re-initialises from it. There is deliberately no
+   * `HYDRATE` action — this prop is the one state-seeding path.
+   */
   initial?: AppState;
 }) {
   const [state, dispatch] = useReducer(reducer, initial);

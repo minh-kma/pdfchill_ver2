@@ -238,6 +238,7 @@ export function ImageToPdfTool({ tool }: ToolPageProps) {
             ? {
                 notice: t('image-to-pdf:zipNotice', { count: images.length }),
                 downloadLabelKey: 'image-to-pdf:downloadZip',
+                downloadedLabelKey: 'image-to-pdf:downloadedZip',
                 onDownload: () => downloadBlob(result.zip!, ZIP_NAME),
               }
             : {})}

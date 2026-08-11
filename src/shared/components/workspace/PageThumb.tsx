@@ -1,9 +1,11 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { PageItem, SourceDoc } from '../../state/types.ts';
 import { DeletePagesIcon, RotateIcon, ZoomIcon } from '../icons.tsx';
 import { PageCanvas } from './PageCanvas.tsx';
+import { useElementBox, WatermarkOverlay, type WatermarkMark } from './WatermarkOverlay.tsx';
 
 const THUMB_WIDTH = 200;
 
@@ -15,13 +17,29 @@ export interface PageThumbProps {
   readonly onRotate: () => void;
   readonly onDelete: () => void;
   readonly onEnlarge: () => void;
+  /**
+   * Live watermark preview for this page, already range-filtered by `Workspace`. Purely an overlay:
+   * it never re-renders the page canvas beneath it.
+   */
+  readonly mark?: WatermarkMark;
 }
 
-export function PageThumb({ page, source, position, onRotate, onDelete, onEnlarge }: PageThumbProps) {
+export function PageThumb({
+  page,
+  source,
+  position,
+  onRotate,
+  onDelete,
+  onEnlarge,
+  mark,
+}: PageThumbProps) {
   const { t } = useTranslation();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: page.id,
   });
+  const canvasBoxRef = useRef<HTMLSpanElement>(null);
+  const canvasBox = useElementBox(canvasBoxRef);
+  const [pageWidthPt, setPageWidthPt] = useState(0);
 
   return (
     <div
@@ -40,12 +58,26 @@ export function PageThumb({ page, source, position, onRotate, onDelete, onEnlarg
         aria-label={t('workspace:page.label', { number: position })}
         className="flex cursor-grab touch-none items-center justify-center rounded-lg bg-slate-100 p-2 active:cursor-grabbing"
       >
-        <PageCanvas
-          source={source}
-          page={page}
-          width={THUMB_WIDTH}
-          className="max-h-44 w-auto max-w-full rounded shadow-sm"
-        />
+        {/* The wrapper is sized by the canvas, so the overlay's box matches the rendered page. */}
+        <span ref={canvasBoxRef} className="relative inline-block leading-none">
+          <PageCanvas
+            source={source}
+            page={page}
+            width={THUMB_WIDTH}
+            className="max-h-44 w-auto max-w-full rounded shadow-sm"
+            onPageSize={(widthPt) => setPageWidthPt(widthPt)}
+          />
+          {mark && (
+            <span className="pointer-events-none absolute inset-0 overflow-hidden">
+              <WatermarkOverlay
+                mark={mark}
+                boxWidth={canvasBox.width}
+                boxHeight={canvasBox.height}
+                pageWidthPt={pageWidthPt}
+              />
+            </span>
+          )}
+        </span>
       </div>
 
       <div className="mt-2 flex items-center gap-1">

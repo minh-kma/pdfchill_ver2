@@ -32,11 +32,18 @@ export function downloadBlob(blob: Blob, fileName: string): void {
   setTimeout(() => URL.revokeObjectURL(url), 10_000);
 }
 
-export async function saveFile(blob: Blob, fileName: string, mimeType: string): Promise<void> {
+/**
+ * Saves, and reports **whether a file actually reached the user**.
+ *
+ * `false` means the user cancelled the save dialog — nothing was written. Callers use this to tell a
+ * genuine download from "the click handler ran": a cancelled save must not leave a button claiming
+ * the file was downloaded.
+ */
+export async function saveFile(blob: Blob, fileName: string, mimeType: string): Promise<boolean> {
   const picker = (window as PickerWindow).showSaveFilePicker;
   if (!picker) {
     downloadBlob(blob, fileName);
-    return;
+    return true;
   }
 
   try {
@@ -47,15 +54,18 @@ export async function saveFile(blob: Blob, fileName: string, mimeType: string): 
     const writable = await handle.createWritable();
     await writable.write(blob);
     await writable.close();
+    return true;
   } catch (error) {
     // The user closing the save dialog means "do nothing" — it must not fall through to an
-    // anchor download they did not ask for (SPEC.md §1.12).
-    if (error instanceof DOMException && error.name === 'AbortError') return;
+    // anchor download they did not ask for (SPEC.md §1.12), and it is not a completed download.
+    if (error instanceof DOMException && error.name === 'AbortError') return false;
     downloadBlob(blob, fileName);
+    return true;
   }
 }
 
-export function savePdf(bytes: Uint8Array, fileName: string): Promise<void> {
+/** Resolves `true` only if the file was actually saved; `false` if the user cancelled. */
+export function savePdf(bytes: Uint8Array, fileName: string): Promise<boolean> {
   return saveFile(toBlob(bytes, 'application/pdf'), fileName, 'application/pdf');
 }
 

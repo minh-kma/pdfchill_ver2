@@ -43,5 +43,6 @@
   "zipNotice_other": "Previewing the first of {{count}} PDFs. The download contains all of them.",
   "errors": {
     "unsupported": "Skipped — only JPG and PNG are supported: {{files}}"
-  }
+  },
+  "downloadedZip": "Zip downloaded"
 }

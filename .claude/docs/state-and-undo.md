@@ -138,3 +138,60 @@ so it needs the encrypted bytes.
   cloning into a plain array.
 - Return early from a `produce` recipe without mutating when an action should be a no-op; that
   preserves the reference equality the history wrapper depends on.
+
+---
+
+## 6. Session autosave & recovery (`shared/state/persistence/`)
+
+Built. Behaviour is `spec/edge-cases.md` ("Persistence") and `spec/features.md` §1.12.
+
+| File | Role |
+|---|---|
+| `sessionSchema.ts` | The persisted shape and every pure rule: key, 5-minute window, 800ms constant, `asBytes`, validation. No IndexedDB, no React. |
+| `sessionStore.ts` | The only IndexedDB code in the app: `loadSession` / `saveSession` / `clearSession`. |
+| `useSessionAutosave.ts` | `planAutosave()` (pure decision) + the debounced effect, mounted as `<SessionAutosave>` inside `StoreProvider`. |
+| `shared/components/SessionRecoveryBanner.tsx` | Restore / Dismiss, with `Intl.RelativeTimeFormat` for the age. |
+
+**Storage key is `pdfdemo:session:v3`, bumped from the old app's `:v2`.** The suffix exists so an
+incompatible older save is ignored rather than migrated, and this rewrite deploys to the same origin
+as the old app — a returning visitor can still hold an old-app `:v2` record whose shape is not v2's.
+Reusing the key would hand that record straight to `fromPersisted()`. This is the opposite call from
+`pdfdemo:lang`, which is deliberately *kept* because its value is a compatible scalar that must
+survive the rewrite. Sessions are disposable; a preference is not.
+
+**What is persisted:** `sources`, `pages`, `docAnnotations`, `assets` — and `savedAt`. That is the
+whole of `PersistedSession`, built field-by-field by `toPersisted()` rather than by spreading state,
+so adding an `AppState` field never silently starts persisting it.
+
+**What is not, and why it structurally cannot be:**
+
+- `past` / `future` — memory-only by design; they are not fields on `PersistedSession`. A restored
+  session starts with empty history, which is the documented behaviour, not a shortcut.
+- The unlock password — lives in `sessionPassword.ts`, module-scoped and outside `AppState`
+  entirely, so no snapshot of state can capture it.
+- `busy` / `busyMessage` — **v2 has no such fields.** The old app bundled transient UI flags into
+  `AppState` (`spec/maintainability.md` #10); this rewrite never did. Nothing to exclude — but do not
+  add them and then persist them.
+
+**Timing rules:**
+
+- Autosave is debounced **800ms**, and only re-armed when one of the four persisted slices changes
+  by reference. An undo/redo push moves `past`/`future` only, so it never triggers a write.
+- A save is offerable only if `now - savedAt` is within **5 minutes**. Older, absent, or unparseable
+  saves produce no banner **and are left in storage** — staleness is never a reason to delete.
+  Only Restore, Dismiss, and Start Over clear a record.
+- Autosave is **suspended entirely** while the banner is pending (and while the initial check is in
+  flight), and a suspended pass does not record the state as seen. Otherwise a write of the empty
+  pre-restore state would overwrite the record being offered.
+- An empty session is never written.
+
+**Hydration goes through `StoreProvider`'s `initial` prop** — the point it was always documented
+for. `App.tsx` holds a `key`; Restore bumps it, remounting the provider so `useReducer`
+re-initialises from the restored state. There is deliberately no `HYDRATE` action: a second
+state-seeding path is exactly what `initial` exists to avoid.
+
+**IndexedDB is used natively, not via `idb-keyval`.** A deliberate implementation deviation from the
+old app — same behaviour, no new dependency, ~60 lines for get/put/delete against one key. Every
+storage call resolves rather than rejects: a blocked or unavailable IndexedDB degrades to "no
+autosave" and never surfaces an error. The `ArrayBuffer` re-wrap (`asBytes`) is structured-clone
+behaviour and is required either way.

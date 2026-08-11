@@ -5,11 +5,14 @@ import { useTranslation } from 'react-i18next';
 import { releaseDocumentsExcept } from '../../pdf/pdfRender.ts';
 import { useStore } from '../../state/store.tsx';
 import { clearSessionPassword } from '../../state/sessionPassword.ts';
+import { clearSession } from '../../state/persistence/sessionStore.ts';
 import { ROTATION_STEP } from '../../lib/rotation.ts';
+import { isPageInRange } from '../../lib/watermarkGeometry.ts';
 import { useDragSensors } from '../dnd/useDragSensors.ts';
 import { RedoIcon, RotateIcon, UndoIcon } from '../icons.tsx';
 import { PageThumb } from './PageThumb.tsx';
 import { PageZoom } from './PageZoom.tsx';
+import { useWorkspacePreviewMark } from './workspacePreview.tsx';
 
 /**
  * The shared page workspace: thumbnail grid, drag-to-reorder, per-page rotate/delete, enlarge.
@@ -22,6 +25,8 @@ export function Workspace() {
   const { t } = useTranslation();
   const { state, dispatch, canUndo, canRedo, fileCount } = useStore();
   const [zoomedPageId, setZoomedPageId] = useState<string>();
+  // A live, un-applied mark published by the active tool's panel (Watermark). Undefined elsewhere.
+  const previewMark = useWorkspacePreviewMark();
 
   const sourcesById = useMemo(
     () => new Map(state.sources.map((source) => [source.id, source])),
@@ -95,6 +100,9 @@ export function Workspace() {
             onClick={() => {
               // The unlock password is cleared on Start Over (`spec/edge-cases.md`).
               clearSessionPassword();
+              // ...as is the autosaved session: Start Over is one of the three explicit clears
+              // (with Restore and Dismiss). Nothing else deletes a saved record.
+              void clearSession();
               dispatch({ type: 'RESET' });
             }}
             className="ms-1 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
@@ -106,16 +114,23 @@ export function Workspace() {
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={state.pages.map((page) => page.id)} strategy={rectSortingStrategy}>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          {/* Capped at 4 columns on desktop (was 5) so thumbnails render larger and more legible.
+              Intermediate breakpoints scale down with it, and the grid now shares its row with the
+              sticky action panel, so it has less width to work with than before. */}
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
             {state.pages.map((page, index) => {
               const source = sourcesById.get(page.sourceId);
               if (!source) return null;
+              // Range is 1-based over the plan, so `position` is what it is checked against — via
+              // the shared `isPageInRange`, the same predicate the bake uses.
+              const showMark = previewMark && isPageInRange(index + 1, previewMark.draft.range);
               return (
                 <PageThumb
                   key={page.id}
                   page={page}
                   source={source}
                   position={index + 1}
+                  {...(showMark ? { mark: previewMark } : {})}
                   onRotate={() =>
                     dispatch({ type: 'ROTATE_PAGE', pageId: page.id, delta: ROTATION_STEP })
                   }

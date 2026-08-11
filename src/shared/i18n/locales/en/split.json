@@ -15,5 +15,6 @@
   "ignored": "Ignored (out of range): {{values}}",
   "resultCount_one": "Result: {{count}} file.",
   "resultCount_other": "Result: {{count}} files.",
-  "action": "Split and download .zip"
+  "action": "Split and download .zip",
+  "downloaded": "Downloaded"
 }

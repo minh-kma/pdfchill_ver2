@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ErrorBanner } from '../../shared/components/ErrorBanner.tsx';
 import { createId } from '../../shared/lib/ids.ts';
@@ -15,6 +15,8 @@ import type { ToolPageProps } from '../../toolRegistry.ts';
 import { BuildAction } from '../organize/BuildAction.tsx';
 import { OrganizeToolShell } from '../organize/OrganizeToolShell.tsx';
 import { WatermarkPreview } from './WatermarkPreview.tsx';
+import type { WatermarkMark } from '../../shared/components/workspace/WatermarkOverlay.tsx';
+import { usePublishWorkspacePreview } from '../../shared/components/workspace/workspacePreview.tsx';
 
 type Mode = 'text' | 'image';
 
@@ -107,8 +109,25 @@ function WatermarkPanel() {
     ? state.sources.find((source) => source.id === firstPage.sourceId)
     : undefined;
 
+  // The object URL and the image's aspect ratio are resolved once here, not per preview surface:
+  // the sample preview and every workspace thumbnail share this one `mark`.
+  const asset = assetId ? state.assets[assetId] : undefined;
+  const assetUrl = useObjectUrl(asset);
+  const imageAspect = useImageAspect(assetUrl);
+
+  const mark: WatermarkMark = useMemo(
+    () => ({ draft, ...(assetUrl ? { assetUrl } : {}), imageAspect }),
+    [draft, assetUrl, imageAspect],
+  );
+
+  // Publish it so the shared Workspace grid overlays it on every page in range. Cleared on unmount,
+  // so leaving the tool takes the overlay with it.
+  usePublishWorkspacePreview(hasContent ? mark : undefined);
+
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+    /* Single column: the shell now supplies the side-by-side split (grid | action panel), so this
+       panel stacks its controls and its sample preview inside that one column. */
+    <div className="space-y-6">
       <div className="rounded-2xl border border-slate-200 bg-white p-5">
         {error && <ErrorBanner error={error} onDismiss={() => setError(undefined)} />}
 
@@ -275,12 +294,7 @@ function WatermarkPanel() {
           {t('watermark:preview')}
         </p>
         {firstPage && firstSource ? (
-          <WatermarkPreview
-            page={firstPage}
-            source={firstSource}
-            draft={draft}
-            asset={assetId ? state.assets[assetId] : undefined}
-          />
+          <WatermarkPreview page={firstPage} source={firstSource} mark={mark} />
         ) : null}
       </div>
     </div>
@@ -342,4 +356,33 @@ function NumberBox({
       className="w-20 rounded-lg border border-slate-300 px-2 py-1.5 text-sm outline-none focus:border-sky-400"
     />
   );
+}
+
+/** One object URL per asset, shared by every preview surface. */
+function useObjectUrl(asset: Asset | undefined): string | undefined {
+  const [url, setUrl] = useState<string>();
+  useEffect(() => {
+    if (!asset) {
+      setUrl(undefined);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(
+      new Blob([asset.bytes.slice().buffer as ArrayBuffer], { type: asset.mimeType }),
+    );
+    setUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [asset]);
+  return url;
+}
+
+/** Decoded once per image, not once per thumbnail. */
+function useImageAspect(url: string | undefined): number {
+  const [aspect, setAspect] = useState(1);
+  useEffect(() => {
+    if (!url) return;
+    const image = new Image();
+    image.onload = () => setAspect(image.naturalWidth / Math.max(1, image.naturalHeight));
+    image.src = url;
+  }, [url]);
+  return aspect;
 }

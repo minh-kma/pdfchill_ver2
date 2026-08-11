@@ -1,0 +1,10 @@
+{
+  "recovery": {
+    "title": "Khôi phục phiên làm việc trước?",
+    "summary": "{{pages}} từ {{files}}, {{when}}",
+    "pages_other": "{{count}} trang",
+    "files_other": "{{count}} tệp",
+    "restore": "Khôi phục",
+    "dismiss": "Bỏ qua"
+  }
+}

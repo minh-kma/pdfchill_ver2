@@ -13,5 +13,6 @@
   "pagesHint_other": "Tạo ra {{count}} tệp, mỗi trang một tệp.",
   "ignored": "Đã bỏ qua (ngoài phạm vi): {{values}}",
   "resultCount_other": "Kết quả: {{count}} tệp.",
-  "action": "Tách và tải .zip"
+  "action": "Tách và tải .zip",
+  "downloaded": "Đã tải xong"
 }

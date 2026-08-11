@@ -34,7 +34,8 @@
     "title": "Xem trước",
     "subtitle": "Kiểm tra kết quả rồi tải xuống.",
     "download": "Tải xuống",
-    "close": "Đóng"
+    "close": "Đóng",
+    "downloaded": "Đã tải xong"
   },
   "errors": {
     "invalidPdf": "Không đọc được “{{file}}”. Tệp có thể bị hỏng hoặc không phải PDF.",

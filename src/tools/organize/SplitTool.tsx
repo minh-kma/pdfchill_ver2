@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ErrorBanner } from '../../shared/components/ErrorBanner.tsx';
-import { DownloadIcon } from '../../shared/components/icons.tsx';
+import { CheckIcon, DownloadIcon } from '../../shared/components/icons.tsx';
 import { downloadBlob } from '../../shared/lib/download.ts';
 import { toErrorKey } from '../../shared/lib/errorKeys.ts';
 import { planBaseName, splitPdf } from '../../shared/lib/pdfCore.ts';
@@ -38,11 +38,26 @@ function SplitPanel() {
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<AppError>();
+  /**
+   * Set only after the zip was actually built and handed to the browser. Never cleared on a timer:
+   * it resets when what-you-would-download genuinely changes — a different split configuration, or
+   * a different document (new file / Start Over, both of which change `state.pages`).
+   *
+   * This is Split's own path: it bypasses `PreviewModal` (SPEC.md §1.2), so it needs its own
+   * done-state rather than inheriting the modal's.
+   */
+  const [done, setDone] = useState(false);
 
   const total = state.pages.length;
 
   const parsed = useMemo(() => buildRanges(input, total), [input, total]);
   const ranges = mode === 'pages' ? eachPageRanges(total) : parsed.ranges;
+
+  // Re-arm the button when the output would genuinely differ: a changed split configuration, or a
+  // changed document (a new file or Start Over both move `total`). Deliberately not a timeout.
+  useEffect(() => {
+    setDone(false);
+  }, [mode, input, total]);
 
   // At least one valid split point, i.e. two or more resulting files (SPEC.md §1.2).
   const canSplit = ranges.length >= 2;
@@ -65,6 +80,8 @@ function SplitPanel() {
       for (const part of parts) zip.file(part.name, part.bytes);
       const blob = await zip.generateAsync({ type: 'blob' });
       downloadBlob(blob, `${baseName}_split.zip`);
+      // Only reached when the zip was built and the download was triggered without throwing.
+      setDone(true);
     } catch (failure) {
       setError({ key: toErrorKey(failure, 'splitting document') });
     } finally {
@@ -73,7 +90,8 @@ function SplitPanel() {
   }
 
   return (
-    <div className="mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-5">
+    /* Fills the shell's action column (it was a centred max-w-xl block under the grid before). */
+    <div className="w-full rounded-2xl border border-slate-200 bg-white p-5">
       {error && <ErrorBanner error={error} onDismiss={() => setError(undefined)} />}
 
       <div className="mb-4 flex gap-2">
@@ -123,11 +141,15 @@ function SplitPanel() {
       <button
         type="button"
         onClick={() => void run()}
-        disabled={!canSplit || busy}
+        disabled={!canSplit || busy || done}
         className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-sky-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-sky-700 disabled:opacity-60"
       >
-        <DownloadIcon className="size-5" />
-        {busy ? t('workspace:actions.working') : t('split:action')}
+        {done ? <CheckIcon className="size-5" /> : <DownloadIcon className="size-5" />}
+        {done
+          ? t('split:downloaded')
+          : busy
+            ? t('workspace:actions.working')
+            : t('split:action')}
       </button>
     </div>
   );

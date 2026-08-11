@@ -197,6 +197,10 @@ src/
       useUnlockGate.tsx        ← ensureDecrypted: sits in EVERY upload path
       sessionPassword.ts       ← the unlock password. Memory only, outside AppState.
       appError.ts              ← the AppError shape shown by ErrorBanner
+      persistence/
+        sessionSchema.ts       ← persisted shape + all pure rules (key, 5min, 800ms, asBytes)
+        sessionStore.ts        ← THE IndexedDB layer: load / save / clear
+        useSessionAutosave.ts  ← planAutosave() + the debounced effect (<SessionAutosave>)
     pdf/
       pdfRender.ts             ← pdf.js: display only. Doc cache + release + render queue.
                                  Also probeEncryption() — the authoritative encryption detector.
@@ -221,6 +225,7 @@ src/
       FileDropzone.tsx         ← drag-drop / click-to-browse PDF input
       PreviewModal.tsx         ← the mandatory review step before any download
       PasswordPrompt.tsx       ← the unlock gate's prompt (retries + Skip)
+      SessionRecoveryBanner.tsx ← Restore / Dismiss for a ≤5min-old autosave
       ZoomModalChrome.tsx      ← Escape-to-close, scroll-lock, backdrop-click (both zoom modals)
       ZoomStepper.tsx          ← 20–300% in 10% steps (both zoom modals)
       ErrorBanner.tsx
@@ -267,8 +272,9 @@ Break these and something silently drifts:
 
 ## 5. Deliberately not built yet
 
-All 11 tools are built ([tool-status.md](tool-status.md)). Still outstanding: session
-autosave and recovery; ads; accounts. (Prerendering + `sitemap.xml` is built — see
-[routing-i18n.md](routing-i18n.md) §4.) Nothing above assumes their
+All 11 tools are built ([tool-status.md](tool-status.md)). Still outstanding: ads. (Prerendering +
+`sitemap.xml` is built — see [routing-i18n.md](routing-i18n.md) §4; session autosave and recovery is
+built — see [state-and-undo.md](state-and-undo.md) §6. Accounts are not a to-do: `spec/constraints.md`
+makes "no account system" permanent.) Nothing above assumes their
 absence — a login feature, for instance, would slot into `AppBar` without touching the registry,
 and `StoreProvider` already takes an `initial` state for session recovery to hydrate.

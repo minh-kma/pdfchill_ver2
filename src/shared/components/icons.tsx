@@ -164,6 +164,12 @@ export const PlusIcon: IconComponent = (props) => (
   </Svg>
 );
 
+export const CheckIcon: IconComponent = (props) => (
+  <Svg {...props}>
+    <path d="M20 6 9 17l-5-5" />
+  </Svg>
+);
+
 export const DownloadIcon: IconComponent = (props) => (
   <Svg {...props}>
     <path d="M12 4v12M8 12.5l4 4 4-4" />

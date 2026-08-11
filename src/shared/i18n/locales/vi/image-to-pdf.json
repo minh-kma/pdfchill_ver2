@@ -41,5 +41,6 @@
   "zipNotice_other": "Đang xem tệp đầu tiên trong {{count}} tệp PDF. Bản tải xuống chứa tất cả.",
   "errors": {
     "unsupported": "Đã bỏ qua — chỉ hỗ trợ JPG và PNG: {{files}}"
-  }
+  },
+  "downloadedZip": "Đã tải xong tệp zip"
 }

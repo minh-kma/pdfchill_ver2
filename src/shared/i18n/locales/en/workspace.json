@@ -36,7 +36,8 @@
     "title": "Preview",
     "subtitle": "Check the result, then download it.",
     "download": "Download",
-    "close": "Close"
+    "close": "Close",
+    "downloaded": "Downloaded"
   },
   "errors": {
     "invalidPdf": "Couldn’t read “{{file}}”. It may be damaged or not a PDF.",

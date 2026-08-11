@@ -101,12 +101,12 @@ password lives in `shared/state/sessionPassword.ts` — memory only, cleared on 
 
 ## What is missing repo-wide
 
-Every tool is built. Still absent, and not to be assumed present: session autosave / recovery
-(IndexedDB), ad units, accounts. Prerendering + `sitemap.xml` is now built
-(`scripts/prerender.mjs`, wired as `postbuild`).
+Every tool is built. Still absent: ad units. Accounts are not a to-do — `spec/constraints.md` makes
+"no account system" permanent.
 
-`StoreProvider` already accepts an `initial` state, which is the hydration point session recovery
-will use.
+Built since this list was first written: prerendering + `sitemap.xml` (`scripts/prerender.mjs`, wired
+as `postbuild`), and session autosave / recovery (`shared/state/persistence/`, hydrating through
+`StoreProvider`'s `initial` prop — see [state-and-undo.md](state-and-undo.md) §6).
 
 ---
 

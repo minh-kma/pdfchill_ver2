@@ -9,8 +9,9 @@ PDFChill v2 is a from-scratch rewrite of pdfchill.online: a free PDF toolkit tha
 the browser — no backend, no accounts, no file byte ever leaving the device. It is a
 registry-driven React SPA where `src/toolRegistry.ts` is the single source of truth per tool.
 **All 11 tools are implemented**; `ComingSoonTool` is no longer referenced by the registry. Still
-outstanding before launch: session autosave/recovery, and accounts. Prerendering + `sitemap.xml` is
-built — `scripts/prerender.mjs`, run as `postbuild`.
+outstanding before launch: ad units. Prerendering + `sitemap.xml` (`scripts/prerender.mjs`, run as
+`postbuild`) and session autosave/recovery (`shared/state/persistence/`) are both built. Accounts are
+not a to-do — `spec/constraints.md` makes "no account system" permanent.
 See [.claude/docs/tool-status.md](.claude/docs/tool-status.md).
 
 ## 2. Tech Stack
