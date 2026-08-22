@@ -3,6 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!--
+      Icons, theme colour and the manifest link. These are the only <head> tags authored by hand,
+      because they are the only ones identical on every page in every language — nothing here
+      varies by route, so none of it belongs in pageMeta.ts. Everything that *does* vary (title,
+      description, canonical, hreflang, Open Graph, robots) is computed there and written in by
+      scripts/prerender.mjs and useDocumentMeta.ts. Do not add a per-page tag to this file.
+
+      The files themselves are generated from images/logo.png; see public/README.md. favicon.ico
+      is listed first and carries 16/32/48 for the browsers that ignore the PNG links and for the
+      bare /favicon.ico request every browser makes anyway.
+    -->
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="/favicon-16.png" type="image/png" sizes="16x16" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <!-- Matches the AppBar, which is what sits under the mobile browser chrome. -->
+    <meta name="theme-color" content="#ffffff" />
+
     <!--
       Single SPA entry point, and the template scripts/prerender.mjs rewrites per route.
 

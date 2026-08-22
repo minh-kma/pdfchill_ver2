@@ -4,7 +4,6 @@ import { useLanguage } from '../i18n/useLanguage.ts';
 import { Link } from '../router/Link.tsx';
 import { AllToolsMenu } from './AllToolsMenu.tsx';
 import { LanguageSwitcher } from './LanguageSwitcher.tsx';
-import { LogoIcon } from './icons.tsx';
 
 /**
  * Nav bar: logo on the left, exactly one dropdown ("All PDF Tools"), language links on the right.
@@ -22,7 +21,21 @@ export function AppBar() {
           aria-label={t('nav:home')}
           className="flex items-center gap-2 rounded-lg px-1 py-1 text-lg font-extrabold tracking-tight text-slate-900"
         >
-          <LogoIcon className="size-6 text-sky-600" />
+          {/*
+            The real brand mark, not an inline glyph. It is a full-bleed square illustration with
+            its own orange ground, so it is clipped to a rounded square the way an app icon is
+            rather than dropped in flat. Served from public/ — the same file the web manifest
+            points at — so there is one copy of the logo in the build, not a second bundled one.
+            `alt=""` because the adjacent wordmark already names the link, and the anchor carries
+            its own aria-label; a second announcement of "PDFChill" here would be noise.
+          */}
+          <img
+            src={`${import.meta.env.BASE_URL}icon-192.png`}
+            alt=""
+            width={28}
+            height={28}
+            className="size-7 rounded-lg"
+          />
           {t('common:appName')}
         </Link>
 

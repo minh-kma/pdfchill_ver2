@@ -4,8 +4,9 @@ import type { Route } from '../router/useRoute.ts';
 import { buildPageMeta } from './pageMeta.ts';
 
 /**
- * Owns every per-page SEO tag: <title>, <meta name="description">, <html lang>, canonical, and
- * the three hreflang alternates (en / vi / x-default -> English), per SPEC.md §4.
+ * Owns every per-page SEO tag: <title>, <meta name="description">, <html lang>, canonical, the
+ * three hreflang alternates (en / vi / x-default -> English) per SPEC.md §4, the Open Graph and
+ * Twitter Card tags, and `robots` on the not-found page.
  *
  * The tags themselves are computed by `buildPageMeta()` in pageMeta.ts; this hook only applies them
  * to the live document. That split is deliberate: the build-time prerenderer
@@ -31,34 +32,51 @@ export function useDocumentMeta(route: Route): void {
     });
 
     document.title = meta.title;
-    upsertMeta('description', meta.description);
     document.documentElement.lang = meta.htmlLang;
 
-    upsertLink('canonical', undefined, meta.canonical);
+    // Cleared and rebuilt wholesale rather than updated in place. Some tags are *absent* on some
+    // routes — the not-found page has no canonical, no hreflang and no `og:url`, and every other
+    // page has no `robots` — so an update-only pass would leave the previous route's tags behind
+    // after a client-side navigation. Removing first also means the tags the prerenderer already
+    // put in the static <head> are replaced rather than duplicated, and `og:locale:alternate`,
+    // which legitimately repeats, cannot accumulate.
+    for (const stale of document.head.querySelectorAll(MANAGED_SELECTOR)) stale.remove();
+
+    appendMeta('name', 'description', meta.description);
+    if (meta.robots) appendMeta('name', 'robots', meta.robots);
+    for (const tag of meta.social) appendMeta(tag.attribute, tag.key, tag.content);
+
+    if (meta.canonical) appendLink('canonical', undefined, meta.canonical);
     for (const alternate of meta.alternates) {
-      upsertLink('alternate', alternate.hreflang, alternate.href);
+      appendLink('alternate', alternate.hreflang, alternate.href);
     }
   }, [route, t, language]);
 }
 
-function upsertMeta(name: string, content: string): void {
-  let tag = document.head.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
-  if (!tag) {
-    tag = document.createElement('meta');
-    tag.name = name;
-    document.head.append(tag);
-  }
+/**
+ * Everything this hook owns. Deliberately narrow: the icon links and `theme-color` in index.html
+ * do not vary by route, are not listed here, and must survive untouched.
+ */
+const MANAGED_SELECTOR = [
+  'meta[name="description"]',
+  'meta[name="robots"]',
+  'meta[property^="og:"]',
+  'meta[name^="twitter:"]',
+  'link[rel="canonical"]',
+  'link[rel="alternate"][hreflang]',
+].join(',');
+
+function appendMeta(attribute: 'property' | 'name', key: string, content: string): void {
+  const tag = document.createElement('meta');
+  tag.setAttribute(attribute, key);
   tag.content = content;
+  document.head.append(tag);
 }
 
-function upsertLink(rel: string, hreflang: string | undefined, href: string): void {
-  const selector = hreflang ? `link[rel="${rel}"][hreflang="${hreflang}"]` : `link[rel="${rel}"]:not([hreflang])`;
-  let tag = document.head.querySelector<HTMLLinkElement>(selector);
-  if (!tag) {
-    tag = document.createElement('link');
-    tag.rel = rel;
-    if (hreflang) tag.hreflang = hreflang;
-    document.head.append(tag);
-  }
+function appendLink(rel: string, hreflang: string | undefined, href: string): void {
+  const tag = document.createElement('link');
+  tag.rel = rel;
+  if (hreflang) tag.hreflang = hreflang;
   tag.href = href;
+  document.head.append(tag);
 }

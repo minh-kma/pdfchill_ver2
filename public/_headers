@@ -1,0 +1,60 @@
+# Response headers for Cloudflare Workers static assets. Vite copies this file into dist/ as-is;
+# Cloudflare reads it from the assets root and never serves it as a URL.
+#
+# Rules are matched most-specific-first, and a matching rule REPLACES the header rather than
+# merging, so the narrow asset rules below repeat what they need from the site-wide block.
+
+/*
+  # No plugins, no framing, no MIME sniffing. This app has no login and no cookies, so there is
+  # nothing to steal by framing it, but clickjacking a PDF tool into an attacker's page is still
+  # a phishing primitive.
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+
+  # Everything this app can do, it does locally. Denying the hardware APIs outright means a
+  # dependency that starts asking for them fails loudly instead of prompting our visitors.
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+  # THE POINT OF THIS FILE.
+  #
+  # `connect-src 'self'` is the machine-checkable version of CLAUDE.md §5 "no backend, ever; no
+  # file byte leaves the device". If anything in this app — our code or a dependency's — ever
+  # tries to POST a PDF somewhere, the browser blocks it and reports it, rather than it shipping
+  # unnoticed. tesseract.js used to fetch its worker, wasm core and 3MB language model from
+  # cdn.jsdelivr.net; scripts/copyTesseractAssets.mjs is what makes `'self'` achievable, and this
+  # header is what keeps it that way.
+  #
+  # 'wasm-unsafe-eval' is required and is not a loosening of script-src: it permits
+  # WebAssembly.compile and nothing else, NOT eval() or new Function(). qpdf-wasm, pdf.js and
+  # tesseract-core all need it. Nothing here needs full 'unsafe-eval' — the only two `new Function`
+  # calls in the shipped bundles (jszip's setImmediate polyfill, webpack's globalThis probe in
+  # tesseract's worker) both sit in branches a modern browser never takes.
+  #
+  # `frame-src blob:` is load-bearing and easy to lose: PreviewModal shows every finished PDF in
+  # an <iframe> pointed at a blob: URL, and since nothing auto-downloads, that modal is on the
+  # path of all 11 tools. Without it the CSP breaks the entire app, not one corner of it.
+  # worker-src blob: covers tesseract, which spawns its worker from a Blob; 'self' covers pdf.js
+  # and the compress worker. img-src data:/blob: covers canvas-derived thumbnails and the image
+  # previews in Image to PDF and Watermark.
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval' blob:; worker-src 'self' blob:; frame-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' data: blob:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'
+
+# Content-hashed by Vite, so the name changes whenever the bytes do — safe to cache forever.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+# NOT content-hashed: the worker builds these filenames by string concatenation, so they must keep
+# their literal names (see scripts/copyTesseractAssets.mjs). A week is long enough to make the
+# ~4MB core and language model a once-per-visitor download, short enough that a tesseract upgrade
+# reaches people without a cache-busting rename.
+/tesseract/*
+  Cache-Control: public, max-age=604800
+  X-Content-Type-Options: nosniff
+
+# Icons and the share card: stable names, so revalidate daily rather than pinning them for a year
+# — a logo change should not need a rename to take effect.
+/*.png
+  Cache-Control: public, max-age=86400
+/favicon.ico
+  Cache-Control: public, max-age=86400

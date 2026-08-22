@@ -116,14 +116,6 @@ export const ChevronDownIcon: IconComponent = (props) => (
   </Svg>
 );
 
-export const LogoIcon: IconComponent = (props) => (
-  <Svg {...props}>
-    <path d="M6.5 3h7L19 8.5V20a1 1 0 0 1-1 1H6.5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" />
-    <path d="M13 3v6h6" />
-    <path d="M9 17v-5h1.8a1.6 1.6 0 0 1 0 3.2H9" />
-  </Svg>
-);
-
 export const UndoIcon: IconComponent = (props) => (
   <Svg {...props}>
     <path d="M4 9h10a5 5 0 0 1 0 10h-4" />

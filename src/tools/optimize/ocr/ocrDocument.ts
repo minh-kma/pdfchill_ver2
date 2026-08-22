@@ -7,6 +7,9 @@
  * without a write-back dependency. `bakeOcrTextLayer.ts` is the other half.
  */
 
+// Bundled and served same-origin, exactly like pdf.js's worker and qpdf's wasm. See the three
+// `*Path` options below for why this one is a `?url` import while the other two are directories.
+import tesseractWorkerUrl from 'tesseract.js/dist/worker.min.js?url';
 import type { NormalizedRect } from '../../../shared/lib/geometry.ts';
 import { getPageCount, getPageTextLength, renderPage } from '../../../shared/pdf/pdfRender.ts';
 
@@ -46,6 +49,37 @@ export interface OcrProgress {
 
 type TesseractWorker = Awaited<ReturnType<typeof import('tesseract.js')['createWorker']>>;
 
+/**
+ * tesseract.js resolves its three runtime assets against cdn.jsdelivr.net unless every path is
+ * given explicitly, so all three are set here. Leaving any one unset silently reintroduces a CDN
+ * fetch — the exact thing CLAUDE.md §5 forbids, and the reason the app would otherwise stop
+ * working offline and leak "this visitor ran OCR" to a third party.
+ *
+ * The directories are produced by `scripts/copyTesseractAssets.mjs` (a `predev`/`prebuild` step),
+ * not by the bundler: the worker builds `${corePath}/tesseract-core-{variant}.wasm.js` and
+ * `${langPath}/{lang}.traineddata.gz` by string concatenation, so those filenames must survive
+ * verbatim and cannot be hashed `?url` imports. `worker.min.js` is referenced as one whole path,
+ * so it can be — and is, which gets it content-hashed caching for free.
+ *
+ * All three are absolutised against the page. tesseract runs its worker from a `blob:` URL
+ * (`workerBlobURL` defaults to true), and both `importScripts()` and `fetch()` inside that worker
+ * resolve relative to the opaque blob URL rather than to the site root — so a root-relative
+ * `/tesseract/...` would not resolve. This also keeps a sub-path deploy (Vite's `base`) working,
+ * since BASE_URL is already baked into the strings below.
+ *
+ * Resolved on first use rather than at module scope, because `location` does not exist in Node and
+ * this module is reachable from an import of the tool registry — which `scripts/prerender.mjs`
+ * does, in Node, for every build. Module-init work here crashes the build.
+ */
+function tesseractPaths() {
+  const sameOrigin = (path: string) => new URL(path, location.href).href;
+  return {
+    workerPath: sameOrigin(tesseractWorkerUrl),
+    corePath: sameOrigin(`${import.meta.env.BASE_URL}tesseract/core`),
+    langPath: sameOrigin(`${import.meta.env.BASE_URL}tesseract/tessdata`),
+  };
+}
+
 /** Cached per language *combination* — switching languages must not reuse the wrong worker. */
 const workers = new Map<string, Promise<TesseractWorker>>();
 
@@ -54,7 +88,14 @@ function getWorker(languages: readonly OcrLanguage[]): Promise<TesseractWorker> 
   const key = [...languages].sort().join('+');
   let worker = workers.get(key);
   if (!worker) {
-    worker = import('tesseract.js').then(({ createWorker }) => createWorker(key));
+    worker = import('tesseract.js').then(({ createWorker, OEM }) =>
+      // The OEM is passed explicitly even though LSTM_ONLY is already the default: it decides
+      // which core filename the worker asks for, and `copyTesseractAssets.mjs` ships only the
+      // matching `-lstm` cores and `4.0.0_best_int` models. Changing it here without changing
+      // that script's lists produces a 404 at the first OCR run, so the two are kept visible to
+      // each other rather than one depending on an invisible default.
+      createWorker(key, OEM.LSTM_ONLY, tesseractPaths()),
+    );
     workers.set(key, worker);
     worker.catch(() => workers.delete(key));
   }

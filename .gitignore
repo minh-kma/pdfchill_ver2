@@ -4,3 +4,10 @@ dist-ssr
 *.local
 .DS_Store
 .vite
+
+# Copied out of node_modules by scripts/copyTesseractAssets.mjs on every predev/prebuild. npm
+# already holds these ~15MB; committing them would only add a second copy to keep in sync.
+public/tesseract
+
+# wrangler's local state (deploy cache, dev sqlite)
+.wrangler

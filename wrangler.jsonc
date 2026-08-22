@@ -1,0 +1,47 @@
+{
+  // Cloudflare deploy config for PDFChill v2.
+  //
+  // SHAPE: this is a Workers *static-assets* config — `assets.directory`, deployed with
+  // `wrangler deploy`, no `main` (the `main` key is optional for an assets-only Worker, and this
+  // app has no server side by design: see CLAUDE.md §5, "No backend, ever"). A classic Pages
+  // project is configured differently, with a top-level `pages_build_output_dir` instead of the
+  // `assets` block. `assets.directory` is what the old app's docs record, so this matches that
+  // precedent; if this is instead wired up as a dashboard Pages project, that one key changes.
+  //
+  // NAME: deliberately not the bare "pdfchill" the old app used — deploying this rewrite under
+  // that name would take over the live project. This one goes live on its own *.workers.dev
+  // preview URL; pointing the real domain at it is a manual, account-level step done later.
+  "name": "pdfchill-v2",
+  "compatibility_date": "2026-08-22",
+
+  // Run the full gate before uploading: `tsc -b && vite build`, wrapped by two hooks npm runs
+  // automatically — `prebuild` copies tesseract's worker, wasm core and language models out of
+  // node_modules into public/tesseract/ (they are gitignored, so a clean checkout has none of
+  // them until this runs), and `postbuild` prerenders the 24 route pages, both 404.html files,
+  // sitemap.xml, robots.txt and site.webmanifest. Deploying without this ships a dist/ that has
+  // none of it — and an OCR tool that 404s on its own wasm.
+  // (Dashboard Git integration does not read this — set the same command there.)
+  "build": {
+    "command": "npm run build"
+  },
+
+  "assets": {
+    // Response headers come from `public/_headers`, which Vite copies here verbatim. Cloudflare
+    // reads that file as configuration and does not serve it as a URL. Its Content-Security-Policy
+    // is what actually enforces "no file byte leaves the device": `connect-src 'self'` means a
+    // dependency that starts phoning home gets blocked by the browser rather than shipping
+    // unnoticed. Removing that file silently removes the guarantee.
+    "directory": "./dist",
+
+    // Every route is a trailing-slashed directory (`/merge-pdf/` -> dist/merge-pdf/index.html),
+    // because buildPath() in shared/lib/routes.ts always emits one. This is the default, set
+    // explicitly because it is what makes the un-slashed `/merge-pdf` resolve rather than 404.
+    "html_handling": "auto-trailing-slash",
+
+    // Load-bearing. The default is "none", which answers an unmatched URL with a null-body 404 —
+    // the SPA never boots, so NotFoundPage.tsx is unreachable and the visitor gets a blank page.
+    // "404-page" serves the nearest 404.html walking up from the requested path, keeping the 404
+    // status. scripts/prerender.mjs emits dist/404.html and dist/vi/404.html for exactly this.
+    "not_found_handling": "404-page"
+  }
+}

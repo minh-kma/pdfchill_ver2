@@ -1,0 +1,45 @@
+# Build gate. Not a deploy pipeline — deployment is a separate, manual Cloudflare step.
+#
+# `npm run build` is the whole gate for this repo (CLAUDE.md §3): there is no test framework
+# installed, so this one command is what catches regressions. It covers three things, because npm
+# runs `postbuild` automatically:
+#   1. `tsc -b`                  — typechecks the project under strict + noUncheckedIndexedAccess
+#   2. `vite build`              — the production bundle
+#   3. `node scripts/prerender.mjs` — the 24 route pages, both 404.html files, sitemap.xml,
+#      robots.txt — and its own assertWellFormed() check, which throws if a generated page is
+#      missing its title/description/canonical/hreflang or the bundle script.
+name: Build
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# A newer push to the same branch makes the in-flight run irrelevant.
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Satisfies package.json's engines range (^20.19.0 || >=22.12.0, which Vite 7 requires)
+          # and matches the version this project is developed on — see CLAUDE.md §3. Pinned rather
+          # than resolved from the range so a new major Node release cannot break CI on its own.
+          node-version: '24'
+          cache: npm
+
+      # `ci`, not `install`: installs exactly the locked tree and fails if package.json and
+      # package-lock.json disagree.
+      - run: npm ci
+
+      # Any non-zero exit here fails the job, which is the point.
+      - run: npm run build

@@ -9,8 +9,10 @@ PDFChill v2 is a from-scratch rewrite of pdfchill.online: a free PDF toolkit tha
 the browser — no backend, no accounts, no file byte ever leaving the device. It is a
 registry-driven React SPA where `src/toolRegistry.ts` is the single source of truth per tool.
 **All 11 tools are implemented**; `ComingSoonTool` is no longer referenced by the registry. Still
-outstanding before launch: ad units. Prerendering + `sitemap.xml` (`scripts/prerender.mjs`, run as
-`postbuild`) and session autosave/recovery (`shared/state/persistence/`) are both built. Accounts are
+outstanding before launch: ad units. Prerendering + `sitemap.xml` / `robots.txt` /
+`site.webmanifest` / the two `404.html` pages (`scripts/prerender.mjs`, run as `postbuild`) and
+session autosave/recovery (`shared/state/persistence/`) are all built, as is the Cloudflare deploy
+config (`wrangler.jsonc` + `public/_headers`). Accounts are
 not a to-do — `spec/constraints.md` makes "no account system" permanent.
 See [.claude/docs/tool-status.md](.claude/docs/tool-status.md).
 
@@ -43,7 +45,12 @@ npm run dev          # Vite dev server, http://localhost:5173
 npm run build        # tsc -b && vite build  — typecheck + production build
 npm run preview      # serve the built output
 npm run typecheck    # tsc -b --noEmit
+npm run icons        # regenerate public/ icons + og-image.png from images/logo.png (only when the logo changes)
+npm run deploy       # wrangler deploy — runs the build first, per wrangler.jsonc
 ```
+
+`dev` and `build` are both preceded by `scripts/copyTesseractAssets.mjs`, which populates the
+gitignored `public/tesseract/`. A clean checkout has no OCR assets until one of those runs.
 
 There is **no test framework installed.** `npm run build` is the gate — it typechecks the whole
 project. Verify behaviour changes by exercising the real modules (the pipeline and reducer are pure
@@ -70,7 +77,15 @@ Violating any of these silently breaks something. The full list is
   `grep -rn "merge-pdf" src/` must return exactly one line.
 - **No backend, ever. No file byte leaves the device.** Every operation runs client-side. Do not
   add an upload, an analytics call carrying file data, or a CDN fetch for a worker — pdf.js's
-  worker is a bundled `?url` import so the app works offline after first load.
+  worker is a bundled `?url` import so the app works offline after first load. `public/_headers`
+  enforces this at the edge: its `connect-src 'self'` turns a dependency that phones home into a
+  blocked request instead of a silent leak. Deleting that file removes the guarantee.
+- **tesseract.js must be handed all three of `workerPath`, `corePath` and `langPath`.** Leave any
+  one unset and it silently falls back to cdn.jsdelivr.net for that asset — that is how the OCR
+  tool shipped fetching its worker, its wasm core and a 3MB language model from a third party.
+  `scripts/copyTesseractAssets.mjs` (a `predev`/`prebuild` step) puts them in `public/tesseract/`,
+  and `ocrDocument.ts` pins `OEM.LSTM_ONLY` because the OEM decides which core *filename* the
+  worker requests — change it there and that script's file list has to change with it.
 - **One URL parser for routing *and* i18n.** `shared/lib/routes.ts` (`parseLocation`/`buildPath`)
   is the only code that interprets a URL. A second `pathname.split('/')` is the exact bug class
   that shipped in the old app. `routes.ts` and `lib/language.ts` stay React-free — detection runs
