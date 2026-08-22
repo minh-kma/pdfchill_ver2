@@ -88,7 +88,14 @@ export function OrganizeToolShell({
         <WorkspacePreviewProvider>
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
             <Workspace />
-            <aside className="lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)] lg:overflow-y-auto">
+            {/*
+             * `top-20`, not `top-4`: the AppBar is `sticky top-0` and 4rem tall, so a panel that
+             * parks at 1rem slides *under* it — the Download button ends up behind a translucent,
+             * backdrop-blurred header instead of staying clickable. 5rem = header height + the
+             * same 1rem breathing room; the max-height subtracts that offset plus a matching gap
+             * at the bottom so a tall panel still scrolls internally rather than being cut off.
+             */}
+            <aside className="lg:sticky lg:top-20 lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto">
               {children}
             </aside>
           </div>

@@ -35,7 +35,7 @@
     "small": "Nhỏ",
     "big": "Lớn"
   },
-  "mergeIntoOne": "Gộp tất cả ảnh vào một tệp PDF",
+  "mergeIntoOne": "Ghép tất cả ảnh vào một tệp PDF",
   "action": "Chuyển sang PDF",
   "downloadZip": "Tải .zip",
   "zipNotice_other": "Đang xem tệp đầu tiên trong {{count}} tệp PDF. Bản tải xuống chứa tất cả.",
