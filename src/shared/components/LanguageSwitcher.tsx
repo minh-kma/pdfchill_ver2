@@ -26,7 +26,7 @@ export function LanguageSwitcher() {
   }
 
   return (
-    <div className="flex items-center gap-0.5 rounded-lg bg-slate-100 p-0.5 text-xs font-bold">
+    <div className="flex items-center gap-0.5 rounded-lg bg-stone-100 p-0.5 text-xs font-bold">
       {SUPPORTED_LANGUAGES.map((lang) => {
         const isActive = lang === active;
         return (
@@ -37,7 +37,7 @@ export function LanguageSwitcher() {
             aria-current={isActive ? 'true' : undefined}
             onClick={(event) => switchTo(event, lang)}
             className={`rounded-md px-2.5 py-1.5 transition ${
-              isActive ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+              isActive ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-600 hover:text-stone-900'
             }`}
           >
             {LABELS[lang]}

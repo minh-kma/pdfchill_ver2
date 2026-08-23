@@ -14,12 +14,12 @@ export function AppBar() {
   const language = useLanguage();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/85 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-stone-200/80 bg-white/85 backdrop-blur">
       <nav className="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4">
         <Link
           to={buildPath(undefined, language)}
           aria-label={t('nav:home')}
-          className="flex items-center gap-2 rounded-lg px-1 py-1 text-lg font-extrabold tracking-tight text-slate-900"
+          className="flex items-center gap-2 rounded-lg px-1 py-1 text-lg font-bold tracking-tight text-stone-900"
         >
           {/*
             The real brand mark, not an inline glyph. It is a full-bleed square illustration with

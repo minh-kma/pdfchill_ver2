@@ -103,22 +103,22 @@ export function PreviewModal({
       role="dialog"
       aria-modal="true"
       aria-label={t('workspace:preview.title')}
-      className="fixed inset-0 z-50 flex flex-col bg-slate-900/70 p-3 sm:p-6"
+      className="fixed inset-0 z-50 flex flex-col bg-stone-900/70 p-3 sm:p-6"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
     >
       <div className="mx-auto flex h-full w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
-        <div className="flex items-center gap-3 border-b border-slate-200 px-4 py-3">
+        <div className="flex items-center gap-3 border-b border-stone-200 px-4 py-3">
           <div className="min-w-0">
-            <h2 className="truncate text-sm font-bold text-slate-900">{fileName}</h2>
-            <p className="text-xs text-slate-500">{t('workspace:preview.subtitle')}</p>
+            <h2 className="truncate text-sm font-bold text-stone-900">{fileName}</h2>
+            <p className="text-xs text-stone-500">{t('workspace:preview.subtitle')}</p>
           </div>
           <div className="ms-auto flex items-center gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+              className="rounded-lg px-3 py-2 text-sm font-bold text-stone-600 transition hover:bg-stone-100"
             >
               {t('workspace:preview.close')}
             </button>
@@ -127,7 +127,7 @@ export function PreviewModal({
               onClick={() => void handleDownload()}
               // Stays disabled once done — no timer re-enables it.
               disabled={saving || done}
-              className="flex items-center gap-1.5 rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:opacity-60"
+              className="flex items-center gap-1.5 rounded-lg bg-brand-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-brand-700 disabled:opacity-60"
             >
               {done && <CheckIcon className="size-4" />}
               {done
@@ -137,16 +137,16 @@ export function PreviewModal({
           </div>
         </div>
         {notice && (
-          <p className="border-b border-slate-200 bg-amber-50 px-4 py-2 text-xs text-amber-800">
+          <p className="border-b border-stone-200 bg-amber-50 px-4 py-2 text-xs text-amber-800">
             {notice}
           </p>
         )}
         {overlay ? (
-          <div className="grid min-h-0 flex-1 place-items-center bg-slate-50 p-8 text-center">
-            <p className="max-w-sm text-sm font-medium text-slate-700">{overlay}</p>
+          <div className="grid min-h-0 flex-1 place-items-center bg-stone-50 p-8 text-center">
+            <p className="max-w-sm text-sm font-normal text-stone-700">{overlay}</p>
           </div>
         ) : (
-          url && <iframe src={url} title={fileName} className="min-h-0 flex-1 bg-slate-100" />
+          url && <iframe src={url} title={fileName} className="min-h-0 flex-1 bg-stone-100" />
         )}
       </div>
     </div>,

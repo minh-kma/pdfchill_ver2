@@ -79,24 +79,24 @@ function UnlockPanel({ file }: { file: LoadedFile }) {
 
   if (!probe) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-500">
+      <div className="rounded-2xl border border-stone-200 bg-white p-5 text-sm text-stone-500">
         {t('unlock:checking')}
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5">
+    <div className="rounded-2xl border border-stone-200 bg-white p-5">
       {error && <ErrorBanner error={error} onDismiss={() => setError(undefined)} />}
 
       {probe.encrypted && (
         <>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-stone-600">
             {t(probe.needsUserPassword ? 'unlock:needsPassword' : 'unlock:ownerOnly')}
           </p>
 
           <label className="mt-4 block">
-            <span className="text-sm font-semibold text-slate-700">{t('unlock:prompt.label')}</span>
+            <span className="text-sm font-bold text-stone-700">{t('unlock:prompt.label')}</span>
             <span className="mt-1.5 flex items-center gap-2">
               <input
                 type={visible ? 'text' : 'password'}
@@ -108,12 +108,12 @@ function UnlockPanel({ file }: { file: LoadedFile }) {
                 onKeyDown={(event) => {
                   if (event.key === 'Enter') void run();
                 }}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-sky-400"
+                className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-brand-500"
               />
               <button
                 type="button"
                 onClick={() => setVisible((value) => !value)}
-                className="shrink-0 rounded-lg px-3 py-2 text-xs font-semibold text-slate-500 transition hover:bg-slate-100"
+                className="shrink-0 rounded-lg px-3 py-2 text-xs font-bold text-stone-500 transition hover:bg-stone-100"
               >
                 {t(visible ? 'unlock:prompt.hide' : 'unlock:prompt.show')}
               </button>
@@ -124,7 +124,7 @@ function UnlockPanel({ file }: { file: LoadedFile }) {
             type="button"
             onClick={() => void run()}
             disabled={busy}
-            className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-sky-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-sky-700 disabled:opacity-60"
+            className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3 text-base font-bold text-white transition hover:bg-brand-700 disabled:opacity-60"
           >
             <UnlockIcon className="size-5" />
             {busy ? t('workspace:actions.working') : t('unlock:action')}

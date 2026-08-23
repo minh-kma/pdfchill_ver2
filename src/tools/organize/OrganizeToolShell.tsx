@@ -49,8 +49,8 @@ export function OrganizeToolShell({
     <div className="mx-auto max-w-7xl px-4 py-10">
       <header className="mb-6">
         {/* Title and description come from the registry entry — never hardcoded per tool. */}
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">{t(tool.nameKey)}</h1>
-        <p className="mt-2 max-w-2xl text-slate-600">{t(tool.descriptionKey)}</p>
+        <h1 className="text-h1 text-stone-900">{t(tool.nameKey)}</h1>
+        <p className="mt-2 max-w-2xl text-stone-600">{t(tool.descriptionKey)}</p>
       </header>
 
       {error && <ErrorBanner error={error} onDismiss={clearError} />}
@@ -88,7 +88,14 @@ export function OrganizeToolShell({
         <WorkspacePreviewProvider>
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
             <Workspace />
-            <aside className="lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)] lg:overflow-y-auto">
+            {/*
+             * `top-20`, not `top-4`: the AppBar is `sticky top-0` and 4rem tall, so a panel that
+             * parks at 1rem slides *under* it — the Download button ends up behind a translucent,
+             * backdrop-blurred header instead of staying clickable. 5rem = header height + the
+             * same 1rem breathing room; the max-height subtracts that offset plus a matching gap
+             * at the bottom so a tall panel still scrolls internally rather than being cut off.
+             */}
+            <aside className="lg:sticky lg:top-20 lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto">
               {children}
             </aside>
           </div>

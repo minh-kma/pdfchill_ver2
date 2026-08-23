@@ -27,7 +27,7 @@ export function ImageCard({ image, position, onRotate, onRemove, onEnlarge }: Im
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={`group relative rounded-xl border bg-white p-2 ${
-        isDragging ? 'z-10 border-sky-400 shadow-lg' : 'border-slate-200'
+        isDragging ? 'z-10 border-brand-500 shadow-lg' : 'border-stone-200'
       }`}
     >
       <div
@@ -35,7 +35,7 @@ export function ImageCard({ image, position, onRotate, onRemove, onEnlarge }: Im
         {...listeners}
         onDoubleClick={onEnlarge}
         aria-label={image.name}
-        className="flex h-32 cursor-grab touch-none items-center justify-center overflow-hidden rounded-lg bg-slate-100 active:cursor-grabbing"
+        className="flex h-32 cursor-grab touch-none items-center justify-center overflow-hidden rounded-lg bg-stone-100 active:cursor-grabbing"
       >
         <img
           src={image.url}
@@ -45,7 +45,7 @@ export function ImageCard({ image, position, onRotate, onRemove, onEnlarge }: Im
         />
       </div>
 
-      <p className="mt-2 truncate text-xs text-slate-500" title={image.name}>
+      <p className="mt-2 truncate text-xs text-stone-500" title={image.name}>
         {position}. {image.name}
       </p>
 
@@ -85,8 +85,8 @@ function IconButton({
       aria-label={label}
       // Colour-only hover, no transform — scale motion reads oddly at icon size
       // (`spec/edge-cases.md`, "UI / interaction").
-      className={`rounded-md p-1.5 text-slate-400 transition-colors ${
-        danger ? 'hover:bg-red-50 hover:text-red-600' : 'hover:bg-sky-50 hover:text-sky-600'
+      className={`rounded-md p-1.5 text-stone-500 transition-colors ${
+        danger ? 'hover:bg-red-50 hover:text-red-600' : 'hover:bg-brand-50 hover:text-brand-600'
       }`}
       onPointerDown={(event) => event.stopPropagation()}
       onClick={(event) => {

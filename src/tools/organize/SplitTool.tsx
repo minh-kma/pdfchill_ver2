@@ -91,7 +91,7 @@ function SplitPanel() {
 
   return (
     /* Fills the shell's action column (it was a centred max-w-xl block under the grid before). */
-    <div className="w-full rounded-2xl border border-slate-200 bg-white p-5">
+    <div className="w-full rounded-2xl border border-stone-200 bg-white p-5">
       {error && <ErrorBanner error={error} onDismiss={() => setError(undefined)} />}
 
       <div className="mb-4 flex gap-2">
@@ -100,10 +100,10 @@ function SplitPanel() {
             key={option}
             type="button"
             onClick={() => setMode(option)}
-            className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition ${
+            className={`flex-1 rounded-lg px-3 py-2 text-sm font-bold transition ${
               mode === option
-                ? 'bg-slate-900 text-white'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                ? 'bg-stone-900 text-white'
+                : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
             }`}
           >
             {t(`split:mode.${option}`)}
@@ -113,20 +113,20 @@ function SplitPanel() {
 
       {mode === 'ranges' ? (
         <label className="block">
-          <span className="text-sm font-semibold text-slate-700">{t('split:splitAfterLabel')}</span>
+          <span className="text-sm font-bold text-stone-700">{t('split:splitAfterLabel')}</span>
           <input
             value={input}
             onChange={(event) => setInput(event.target.value)}
             placeholder={t('split:splitAfterPlaceholder')}
             inputMode="numeric"
-            className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-sky-400"
+            className="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-brand-500"
           />
-          <span className="mt-1.5 block text-xs text-slate-500">
+          <span className="mt-1.5 block text-xs text-stone-500">
             {t('split:splitAfterHint', { total })}
           </span>
         </label>
       ) : (
-        <p className="text-sm text-slate-600">{t('split:pagesHint', { count: total })}</p>
+        <p className="text-sm text-stone-600">{t('split:pagesHint', { count: total })}</p>
       )}
 
       {parsed.ignored.length > 0 && mode === 'ranges' && (
@@ -136,13 +136,13 @@ function SplitPanel() {
         </p>
       )}
 
-      <p className="mt-4 text-sm text-slate-600">{t('split:resultCount', { count: ranges.length })}</p>
+      <p className="mt-4 text-sm text-stone-600">{t('split:resultCount', { count: ranges.length })}</p>
 
       <button
         type="button"
         onClick={() => void run()}
         disabled={!canSplit || busy || done}
-        className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-sky-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-sky-700 disabled:opacity-60"
+        className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3 text-base font-bold text-white transition hover:bg-brand-700 disabled:opacity-60"
       >
         {done ? <CheckIcon className="size-5" /> : <DownloadIcon className="size-5" />}
         {done

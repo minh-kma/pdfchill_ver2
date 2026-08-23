@@ -57,10 +57,10 @@ export function Workspace() {
 
   return (
     <section>
-      <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2">
+      <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2">
         {/* SPEC.md §1.4's "{pages} from {files}". The two counts pluralise independently, so each
             is resolved on its own before being composed — i18next keys carry a single `count`. */}
-        <p className="text-sm font-semibold text-slate-700">
+        <p className="text-sm font-bold text-stone-700">
           {t('workspace:header.summary', {
             pages: t('workspace:header.pages', { count: state.pages.length }),
             files: t('workspace:header.files', { count: fileCount }),
@@ -105,7 +105,7 @@ export function Workspace() {
               void clearSession();
               dispatch({ type: 'RESET' });
             }}
-            className="ms-1 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
+            className="ms-1 rounded-lg px-3 py-1.5 text-sm font-bold text-stone-500 transition hover:bg-stone-100 hover:text-stone-800"
           >
             {t('workspace:actions.startOver')}
           </button>
@@ -173,7 +173,7 @@ function ToolbarButton({
       aria-label={label}
       onClick={onClick}
       disabled={disabled}
-      className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 disabled:opacity-40 disabled:hover:bg-transparent"
+      className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-bold text-stone-600 transition hover:bg-stone-100 hover:text-stone-900 disabled:opacity-40 disabled:hover:bg-transparent"
     >
       {children}
     </button>

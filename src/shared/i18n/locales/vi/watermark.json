@@ -25,7 +25,7 @@
   "apply": "Áp dụng dấu mờ",
   "update": "Cập nhật dấu mờ",
   "remove": "Xóa dấu mờ",
-  "applied": "Đã áp dụng dấu mờ. Dấu sẽ có trong mọi tệp xuất ra — kể cả sau khi gộp, tách hay xoay.",
+  "applied": "Đã áp dụng dấu mờ. Dấu sẽ có trong mọi tệp xuất ra — kể cả sau khi ghép, tách hay xoay.",
   "preview": "Xem trước (trang 1)",
   "action": "Lưu PDF có dấu mờ",
   "errors": {

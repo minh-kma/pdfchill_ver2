@@ -1,9 +1,10 @@
 {
-  "heroTitle": "Thư thái xử lý mọi tệp PDF — Đơn giản, mượt mà cùng PDFChill",
-  "heroSubtitle": "Gộp, tách, nén, chuyển đổi, bảo vệ và mở khóa PDF — miễn phí và hoàn toàn trong trình duyệt của bạn.",
+  "heroTitleLead": "Thư thái xử lý mọi tệp PDF",
+  "heroTitleAccent": "Đơn giản, mượt mà cùng PDFChill",
+  "heroSubtitle": "Ghép, tách, nén, chuyển đổi, bảo vệ và mở khóa PDF — miễn phí và hoàn toàn trong trình duyệt của bạn.",
   "filterAll": "Tất cả công cụ",
   "filterLabel": "Lọc công cụ theo danh mục",
   "toolCount_other": "{{count}} công cụ",
   "seoTitle": "PDFChill — Công cụ PDF miễn phí ngay trên trình duyệt",
-  "seoDescription": "Gộp, tách, nén, OCR, chuyển đổi, đóng dấu, bảo vệ và mở khóa tệp PDF miễn phí. Mọi thứ chạy trong trình duyệt — không tải lên, không cần tài khoản."
+  "seoDescription": "Ghép, tách, nén, OCR, chuyển đổi, đóng dấu, bảo vệ và mở khóa tệp PDF miễn phí. Mọi thứ chạy trong trình duyệt — không tải lên, không cần tài khoản."
 }

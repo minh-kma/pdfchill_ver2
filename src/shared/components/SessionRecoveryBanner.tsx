@@ -29,11 +29,11 @@ export function SessionRecoveryBanner({
   return (
     <div
       role="status"
-      className="mx-auto mt-4 flex w-full max-w-5xl flex-wrap items-center gap-3 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900"
+      className="mx-auto mt-4 flex w-full max-w-5xl flex-wrap items-center gap-3 rounded-xl border border-accent-200 bg-accent-50 px-4 py-3 text-sm text-accent-900"
     >
       <div className="flex-1">
-        <p className="font-semibold">{t('session:recovery.title')}</p>
-        <p className="text-sky-800">
+        <p className="font-bold">{t('session:recovery.title')}</p>
+        <p className="text-accent-800">
           {t('session:recovery.summary', {
             // Two independent counts cannot share one plural suffix, so each is resolved on its own
             // and composed — the same pattern `workspace:header` uses (see routing-i18n.md).
@@ -48,14 +48,14 @@ export function SessionRecoveryBanner({
         <button
           type="button"
           onClick={onDismiss}
-          className="rounded-lg px-3 py-1.5 font-semibold text-sky-700 transition hover:bg-sky-100"
+          className="rounded-lg px-3 py-1.5 font-bold text-accent-800 transition hover:bg-accent-100"
         >
           {t('session:recovery.dismiss')}
         </button>
         <button
           type="button"
           onClick={onRestore}
-          className="rounded-lg bg-sky-600 px-3 py-1.5 font-semibold text-white transition hover:bg-sky-700"
+          className="rounded-lg bg-brand-600 px-3 py-1.5 font-bold text-white transition hover:bg-brand-700"
         >
           {t('session:recovery.restore')}
         </button>

@@ -39,7 +39,7 @@ export function PasswordPrompt({ fileName, retrying, onSubmit, onSkip }: Passwor
       role="dialog"
       aria-modal="true"
       aria-label={t('unlock:prompt.title')}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/70 p-4"
     >
       <form
         onSubmit={(event) => {
@@ -49,8 +49,8 @@ export function PasswordPrompt({ fileName, retrying, onSubmit, onSkip }: Passwor
         }}
         className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl"
       >
-        <h2 className="text-base font-bold text-slate-900">{t('unlock:prompt.title')}</h2>
-        <p className="mt-1 truncate text-sm text-slate-500" title={fileName}>
+        <h2 className="text-base font-bold text-stone-900">{t('unlock:prompt.title')}</h2>
+        <p className="mt-1 truncate text-sm text-stone-500" title={fileName}>
           {fileName}
         </p>
 
@@ -68,12 +68,12 @@ export function PasswordPrompt({ fileName, retrying, onSubmit, onSkip }: Passwor
             onChange={(event) => setPassword(event.target.value)}
             aria-label={t('unlock:prompt.label')}
             autoComplete="off"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-sky-400"
+            className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-brand-500"
           />
           <button
             type="button"
             onClick={() => setVisible((value) => !value)}
-            className="shrink-0 rounded-lg px-3 py-2 text-xs font-semibold text-slate-500 transition hover:bg-slate-100"
+            className="shrink-0 rounded-lg px-3 py-2 text-xs font-bold text-stone-500 transition hover:bg-stone-100"
           >
             {t(visible ? 'unlock:prompt.hide' : 'unlock:prompt.show')}
           </button>
@@ -82,14 +82,14 @@ export function PasswordPrompt({ fileName, retrying, onSubmit, onSkip }: Passwor
         <div className="mt-5 flex gap-2">
           <button
             type="submit"
-            className="flex-1 rounded-full bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-700"
+            className="flex-1 rounded-full bg-brand-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-700"
           >
             {t('unlock:prompt.submit')}
           </button>
           <button
             type="button"
             onClick={onSkip}
-            className="rounded-full px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+            className="rounded-full px-4 py-2.5 text-sm font-bold text-stone-600 transition hover:bg-stone-100"
           >
             {t('unlock:prompt.skip')}
           </button>

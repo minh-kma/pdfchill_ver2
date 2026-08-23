@@ -1,5 +1,167 @@
 @import 'tailwindcss';
 
+/*
+ * Design tokens. This block is the whole palette and the whole type scale — there are no colour
+ * or size literals in the .tsx files, and no tailwind.config.* anywhere (Tailwind 4 is CSS-first).
+ *
+ * The ramps are generated, not eyeballed: one shared OKLCH lightness spine across five hues, so
+ * `brand-600`, `green-600` and `violet-600` are the same darkness and can be swapped without
+ * rechecking contrast. Two spacings in that spine are deliberate:
+ *
+ *   500 -> 600 is a wide jump. 4.5:1 against white falls at L~55%, and the 600 value is solved
+ *     for the worst hue of the five (green, 54.8%). So every `*-600` and darker carries white
+ *     text at AA; every `*-500` and lighter is a SURFACE and must never carry white text.
+ *     brand-500 is the logo orange exactly (#f87018) and measures 2.87:1 — surfaces only.
+ *
+ *   100 sits at L 93%, below --color-canvas at L 95%, so a `*-100` tint chip stays visible
+ *     against the cream page. Pitch 100 level with the canvas and the chip disappears.
+ *
+ * `@theme static` — not plain `@theme` — is required and must stay. Tailwind only emits the
+ * variables it can see a utility class for, and the tool-icon tones are read as raw
+ * `var(--color-<ramp>-<step>)` from inline styles in icons.tsx, which the class scanner never
+ * looks at. With plain `@theme` those variables are absent at runtime, every tone silently falls
+ * back to `currentColor`, and all 11 icons render as flat near-black shapes on untinted tiles.
+ */
+@theme static {
+  /* brand */
+  --color-brand-50: oklch(97.2% 0.012 46.43); /* #fdf4ef  1.09:1 on white */
+  --color-brand-100: oklch(93.0% 0.040 46.43); /* #ffe0d2  1.24:1 on white */
+  --color-brand-200: oklch(87.8% 0.070 46.43); /* #ffc9b0  1.47:1 on white */
+  --color-brand-300: oklch(82.2% 0.108 46.43); /* #ffaf88  1.79:1 on white */
+  --color-brand-400: oklch(76.0% 0.150 46.43); /* #fd9058  2.26:1 on white */
+  --color-brand-500: oklch(69.9% 0.188 46.43); /* #f87018  2.87:1 on white */
+  --color-brand-600: oklch(54.5% 0.165 46.43); /* #b94700  5.29:1 on white */
+  --color-brand-700: oklch(47.0% 0.144 46.43); /* #983800  7.23:1 on white */
+  --color-brand-800: oklch(39.5% 0.120 46.43); /* #772b00  9.86:1 on white */
+  --color-brand-900: oklch(33.0% 0.098 46.43); /* #5c2000  12.65:1 on white */
+
+  /* accent */
+  --color-accent-50: oklch(97.2% 0.009 176.00); /* #f0f8f5  1.08:1 on white */
+  --color-accent-100: oklch(93.0% 0.026 176.00); /* #d7eee7  1.22:1 on white */
+  --color-accent-200: oklch(87.8% 0.046 176.00); /* #b8e1d6  1.42:1 on white */
+  --color-accent-300: oklch(82.2% 0.068 176.00); /* #95d4c3  1.69:1 on white */
+  --color-accent-400: oklch(76.0% 0.089 176.00); /* #6fc4af  2.06:1 on white */
+  --color-accent-500: oklch(69.9% 0.100 176.00); /* #4eb29c  2.56:1 on white */
+  --color-accent-600: oklch(54.5% 0.094 176.00); /* #1c826e  4.72:1 on white */
+  --color-accent-700: oklch(47.0% 0.084 176.00); /* #0e6a59  6.52:1 on white */
+  --color-accent-800: oklch(39.5% 0.071 176.00); /* #075345  9.06:1 on white */
+  --color-accent-900: oklch(33.0% 0.058 176.00); /* #073f34  11.88:1 on white */
+
+  /* violet */
+  --color-violet-50: oklch(97.2% 0.010 295.00); /* #f6f5fc  1.09:1 on white */
+  --color-violet-100: oklch(93.0% 0.034 295.00); /* #e9e4fd  1.24:1 on white */
+  --color-violet-200: oklch(87.8% 0.062 295.00); /* #d9cffc  1.47:1 on white */
+  --color-violet-300: oklch(82.2% 0.096 295.00); /* #c9b9fd  1.78:1 on white */
+  --color-violet-400: oklch(76.0% 0.134 295.00); /* #b79ffd  2.24:1 on white */
+  --color-violet-500: oklch(69.9% 0.165 295.00); /* #a786f9  2.84:1 on white */
+  --color-violet-600: oklch(54.5% 0.165 295.00); /* #7956c4  5.31:1 on white */
+  --color-violet-700: oklch(47.0% 0.144 295.00); /* #6245a2  7.26:1 on white */
+  --color-violet-800: oklch(39.5% 0.120 295.00); /* #4c357f  9.89:1 on white */
+  --color-violet-900: oklch(33.0% 0.098 295.00); /* #3a2861  12.67:1 on white */
+
+  /* sand */
+  --color-sand-50: oklch(97.2% 0.012 95.10); /* #f8f6ed  1.08:1 on white */
+  --color-sand-100: oklch(93.0% 0.040 95.10); /* #f0e8ca  1.23:1 on white */
+  --color-sand-200: oklch(87.8% 0.068 95.10); /* #e5d7a4  1.44:1 on white */
+  --color-sand-300: oklch(82.2% 0.100 95.10); /* #d9c477  1.73:1 on white */
+  --color-sand-400: oklch(76.0% 0.132 95.10); /* #cbb040  2.14:1 on white */
+  --color-sand-500: oklch(69.9% 0.148 95.10); /* #bb9c00  2.68:1 on white */
+  --color-sand-600: oklch(54.5% 0.116 95.10); /* #856e00  4.94:1 on white */
+  --color-sand-700: oklch(47.0% 0.100 95.10); /* #6d5900  6.81:1 on white */
+  --color-sand-800: oklch(39.5% 0.085 95.10); /* #554500  9.39:1 on white */
+  --color-sand-900: oklch(33.0% 0.070 95.10); /* #413400  12.20:1 on white */
+
+  /* green */
+  --color-green-50: oklch(97.2% 0.012 145.00); /* #f1f8f1  1.08:1 on white */
+  --color-green-100: oklch(93.0% 0.038 145.00); /* #d9efd9  1.21:1 on white */
+  --color-green-200: oklch(87.8% 0.066 145.00); /* #bde3bd  1.41:1 on white */
+  --color-green-300: oklch(82.2% 0.098 145.00); /* #9dd69e  1.68:1 on white */
+  --color-green-400: oklch(76.0% 0.132 145.00); /* #78c77b  2.05:1 on white */
+  --color-green-500: oklch(69.9% 0.155 145.00); /* #57b75e  2.53:1 on white */
+  --color-green-600: oklch(54.5% 0.143 145.00); /* #2c8535  4.66:1 on white */
+  --color-green-700: oklch(47.0% 0.124 145.00); /* #226c2a  6.47:1 on white */
+  --color-green-800: oklch(39.5% 0.104 145.00); /* #19541f  9.00:1 on white */
+  --color-green-900: oklch(33.0% 0.084 145.00); /* #134017  11.83:1 on white */
+
+  /*
+   * The page. Its own token, NOT brand-50: the page is a warm near-neutral, while brand-50 is a
+   * tint of the button colour, and collapsing the two makes every brand-tinted surface vanish
+   * into the background. Cards stay pure white — that step is what gives the page depth, and it
+   * survives with shadows disabled (1.16:1 white-on-canvas).
+   *   stone-700 on canvas  8.86:1      stone-600 on canvas  6.59:1      white on canvas  1.16:1
+   */
+  --color-canvas: oklch(95.0% 0.012 52); /* #f5ece7 */
+
+  /*
+   * System stack only — `font-src 'self'` in public/_headers means a webfont CDN is blocked, and
+   * self-hosting a face would be bytes for nothing. All the differentiation lives in the scale
+   * below instead: big jumps between display / h1 / h2, negative tracking on the large sizes,
+   * and exactly two weights (400 / 700).
+   *
+   * Line heights on display and h1 are set from a MEASUREMENT, not taste. Vietnamese stacks two
+   * marks on one vowel — the tone mark sits above the circumflex/horn in "ệ", "ượ", "ẫ", "ỗ", and
+   * on capitals "Ệ", "Ẫ", "Ộ" — and a dot-below can hang under the same glyph. Measured against
+   * the system stack with canvas TextMetrics, that worst case is 1.031em of ink above the
+   * baseline plus 0.25em below: 1.281em total. Anything under that makes consecutive lines
+   * collide, and since English never stacks marks it fails invisibly in one language only.
+   * 1.3 is that measurement plus a hair. Do not tighten it back to look more like the reference.
+   */
+  --text-display: clamp(2.25rem, 1.55rem + 3.0vw, 3.5rem);
+  --text-display--line-height: 1.3;
+  --text-display--letter-spacing: -0.025em;
+  --text-display--font-weight: 700;
+
+  --text-h1: clamp(1.875rem, 1.55rem + 1.4vw, 2.5rem);
+  --text-h1--line-height: 1.3;
+  --text-h1--letter-spacing: -0.02em;
+  --text-h1--font-weight: 700;
+
+  --text-h2: clamp(1.375rem, 1.24rem + 0.6vw, 1.625rem);
+  --text-h2--line-height: 1.35;
+  --text-h2--letter-spacing: -0.015em;
+  --text-h2--font-weight: 700;
+
+  --text-h3: 1.0625rem;
+  --text-h3--line-height: 1.45;
+  --text-h3--letter-spacing: -0.008em;
+  --text-h3--font-weight: 700;
+
+  /*
+   * `lead` exists for one job: the hero subtitle. Under a 56px display, body at 1rem leaves a
+   * visible hole, and the next step up (h3) is a 700-weight heading token. This is the only
+   * non-heading step between them.
+   */
+  --text-lead: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+  --text-lead--line-height: 1.6;
+  --text-lead--letter-spacing: -0.005em;
+  --text-lead--font-weight: 400;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.65;
+  --text-body--letter-spacing: 0em;
+  --text-body--font-weight: 400;
+
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.55;
+  --text-small--letter-spacing: 0.005em;
+  --text-small--font-weight: 400;
+
+  /* Generous rounding, per the reference. `control` is the one inputs and small buttons share. */
+  --radius-control: 0.625rem;
+  --radius-tile: 0.875rem;
+  --radius-card: 1.25rem;
+  --radius-panel: 1.5rem;
+
+  /*
+   * Soft, wide and low-opacity, tinted warm (oklch(32% 0.03 50)) rather than neutral black — a
+   * grey shadow on a cream page reads as dirt. Card depth comes mostly from the wide second
+   * layer; the 1px layer only defines the edge.
+   */
+  --shadow-card: 0 1px 2px rgb(64 46 37 / 0.04), 0 8px 24px -6px rgb(64 46 37 / 0.08);
+  --shadow-card-hover: 0 2px 4px rgb(64 46 37 / 0.05), 0 18px 40px -10px rgb(64 46 37 / 0.14);
+  --shadow-pop: 0 4px 10px rgb(64 46 37 / 0.06), 0 24px 56px -12px rgb(64 46 37 / 0.18);
+}
+
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
@@ -9,7 +171,13 @@
     @apply antialiased;
   }
 
+  /*
+   * One focus ring for the whole app. Several inputs used to set `outline-none` and colour their
+   * border instead, which left keyboard users with no indicator at all on some of them — the
+   * border tint is invisible against a focused field's own chrome. Nothing may override this;
+   * add emphasis with a ring or border, never by removing the outline.
+   */
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-sky-500;
+    @apply outline-2 outline-offset-2 outline-brand-600;
   }
 }

@@ -18,7 +18,7 @@ export function ErrorBanner({ error, onDismiss }: { error: AppError; onDismiss?:
         <button
           type="button"
           onClick={onDismiss}
-          className="font-semibold text-red-600 transition hover:text-red-800"
+          className="font-bold text-red-600 transition hover:text-red-800"
         >
           {t('workspace:errors.dismiss')}
         </button>
