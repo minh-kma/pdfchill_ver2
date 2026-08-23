@@ -61,7 +61,7 @@ export function ZoomModalChrome({
           type="button"
           aria-label={t('workspace:preview.close')}
           onClick={onClose}
-          className={`${controls ? '' : 'ms-auto'} rounded-lg p-2 transition hover:bg-white/15`}
+          className={`${controls ? '' : 'ms-auto'} rounded-lg p-2 transition hover:bg-white/15 focus-visible:outline-brand-300`}
         >
           <CloseIcon className="size-5" />
         </button>

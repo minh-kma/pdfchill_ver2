@@ -119,7 +119,7 @@ function SplitPanel() {
             onChange={(event) => setInput(event.target.value)}
             placeholder={t('split:splitAfterPlaceholder')}
             inputMode="numeric"
-            className="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-brand-500"
+            className="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-brand-500"
           />
           <span className="mt-1.5 block text-xs text-stone-500">
             {t('split:splitAfterHint', { total })}

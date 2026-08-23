@@ -61,7 +61,7 @@ export function ZoomStepper({ control }: { control: ZoomControl }) {
         aria-label={t('workspace:zoom.out')}
         onClick={control.zoomOut}
         disabled={control.zoom <= MIN_ZOOM}
-        className="rounded-md px-3 py-1 text-lg leading-none transition hover:bg-white/15 disabled:opacity-40"
+        className="rounded-md px-3 py-1 text-lg leading-none transition hover:bg-white/15 focus-visible:outline-brand-300 disabled:opacity-40"
       >
         −
       </button>
@@ -78,7 +78,7 @@ export function ZoomStepper({ control }: { control: ZoomControl }) {
         }}
         aria-label={t('workspace:zoom.label')}
         inputMode="numeric"
-        className="w-14 rounded-md bg-white/10 px-2 py-1 text-center text-sm tabular-nums outline-none focus:bg-white/20"
+        className="w-14 rounded-md bg-white/10 px-2 py-1 text-center text-sm tabular-nums focus:bg-white/20 focus-visible:outline-brand-300"
       />
       <span className="pe-1 text-sm">%</span>
       <button
@@ -86,7 +86,7 @@ export function ZoomStepper({ control }: { control: ZoomControl }) {
         aria-label={t('workspace:zoom.in')}
         onClick={control.zoomIn}
         disabled={control.zoom >= MAX_ZOOM}
-        className="rounded-md px-3 py-1 text-lg leading-none transition hover:bg-white/15 disabled:opacity-40"
+        className="rounded-md px-3 py-1 text-lg leading-none transition hover:bg-white/15 focus-visible:outline-brand-300 disabled:opacity-40"
       >
         +
       </button>

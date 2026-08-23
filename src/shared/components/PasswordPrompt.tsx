@@ -68,7 +68,7 @@ export function PasswordPrompt({ fileName, retrying, onSubmit, onSkip }: Passwor
             onChange={(event) => setPassword(event.target.value)}
             aria-label={t('unlock:prompt.label')}
             autoComplete="off"
-            className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-brand-500"
+            className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-brand-500"
           />
           <button
             type="button"

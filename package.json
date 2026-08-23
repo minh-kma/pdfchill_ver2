@@ -9,7 +9,7 @@
   "scripts": {
     "predev": "node scripts/copyTesseractAssets.mjs",
     "dev": "vite",
-    "prebuild": "node scripts/copyTesseractAssets.mjs",
+    "prebuild": "node scripts/copyTesseractAssets.mjs && node scripts/checkThemeColour.mjs",
     "build": "tsc -b && vite build",
     "postbuild": "node scripts/prerender.mjs",
     "preview": "vite preview",
