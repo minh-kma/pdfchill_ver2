@@ -56,7 +56,7 @@ export function BuildAction({ labelKey, suffix }: BuildActionProps) {
           onClick={() => void run()}
           disabled={busy || state.pages.length === 0}
           /* Fills the shell's action column rather than sitting centred under the grid. */
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-sky-600 px-7 py-3 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-sky-700 hover:shadow-lg disabled:translate-y-0 disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-brand-600 px-7 py-3 text-base font-bold text-white transition hover:-translate-y-0.5 hover:bg-brand-700 hover:shadow-lg disabled:translate-y-0 disabled:opacity-60"
         >
           <DownloadIcon className="size-5" />
           {busy ? t('workspace:actions.working') : t(labelKey)}

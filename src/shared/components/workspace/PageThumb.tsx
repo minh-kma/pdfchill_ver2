@@ -46,7 +46,7 @@ export function PageThumb({
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={`group relative rounded-xl border bg-white p-2 ${
-        isDragging ? 'z-10 border-sky-400 shadow-lg' : 'border-slate-200'
+        isDragging ? 'z-10 border-brand-500 shadow-lg' : 'border-stone-200'
       }`}
     >
       {/* The drag handle is the whole card. The 6px pointer activation distance (Workspace's
@@ -56,7 +56,7 @@ export function PageThumb({
         {...listeners}
         onDoubleClick={onEnlarge}
         aria-label={t('workspace:page.label', { number: position })}
-        className="flex cursor-grab touch-none items-center justify-center rounded-lg bg-slate-100 p-2 active:cursor-grabbing"
+        className="flex cursor-grab touch-none items-center justify-center rounded-lg bg-stone-100 p-2 active:cursor-grabbing"
       >
         {/* The wrapper is sized by the canvas, so the overlay's box matches the rendered page. */}
         <span ref={canvasBoxRef} className="relative inline-block leading-none">
@@ -81,7 +81,7 @@ export function PageThumb({
       </div>
 
       <div className="mt-2 flex items-center gap-1">
-        <span className="text-xs font-semibold text-slate-500">{position}</span>
+        <span className="text-xs font-bold text-stone-500">{position}</span>
         <div className="ms-auto flex items-center gap-0.5">
           <IconButton label={t('workspace:page.enlarge')} onClick={onEnlarge}>
             <ZoomIcon className="size-4" />
@@ -115,8 +115,8 @@ function IconButton({
       title={label}
       aria-label={label}
       // Colour-only hover, no transform: scale motion reads oddly at icon size (SPEC.md §2).
-      className={`rounded-md p-1.5 text-slate-400 transition-colors ${
-        danger ? 'hover:bg-red-50 hover:text-red-600' : 'hover:bg-sky-50 hover:text-sky-600'
+      className={`rounded-md p-1.5 text-stone-500 transition-colors ${
+        danger ? 'hover:bg-red-50 hover:text-red-600' : 'hover:bg-brand-50 hover:text-brand-600'
       }`}
       onPointerDown={(event) => event.stopPropagation()}
       onClick={(event) => {

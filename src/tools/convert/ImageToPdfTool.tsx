@@ -108,8 +108,8 @@ export function ImageToPdfTool({ tool }: ToolPageProps) {
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       <header className="mb-6">
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">{t(tool.nameKey)}</h1>
-        <p className="mt-2 max-w-2xl text-slate-600">{t(tool.descriptionKey)}</p>
+        <h1 className="text-h1 text-stone-900">{t(tool.nameKey)}</h1>
+        <p className="mt-2 max-w-2xl text-stone-600">{t(tool.descriptionKey)}</p>
       </header>
 
       {error && <ErrorBanner error={error} onDismiss={() => setError(undefined)} />}
@@ -129,29 +129,29 @@ export function ImageToPdfTool({ tool }: ToolPageProps) {
 
       {images.length > 0 && (
         <>
-          <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2">
-            <p className="text-sm font-semibold text-slate-700">
+          <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2">
+            <p className="text-sm font-bold text-stone-700">
               {t('image-to-pdf:imageCount', { count: images.length })}
             </p>
             <div className="ms-auto flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => sortByName('asc')}
-                className="rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+                className="rounded-lg px-3 py-1.5 text-sm font-bold text-stone-600 transition hover:bg-stone-100"
               >
                 {t('image-to-pdf:sortAsc')}
               </button>
               <button
                 type="button"
                 onClick={() => sortByName('desc')}
-                className="rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+                className="rounded-lg px-3 py-1.5 text-sm font-bold text-stone-600 transition hover:bg-stone-100"
               >
                 {t('image-to-pdf:sortDesc')}
               </button>
               <button
                 type="button"
                 onClick={clear}
-                className="rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
+                className="rounded-lg px-3 py-1.5 text-sm font-bold text-stone-500 transition hover:bg-stone-100 hover:text-stone-800"
               >
                 {t('workspace:actions.startOver')}
               </button>
@@ -175,7 +175,7 @@ export function ImageToPdfTool({ tool }: ToolPageProps) {
             </SortableContext>
           </DndContext>
 
-          <div className="mt-6 grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 sm:grid-cols-3">
+          <div className="mt-6 grid gap-4 rounded-2xl border border-stone-200 bg-white p-5 sm:grid-cols-3">
             <Select
               label={t('image-to-pdf:pageSize')}
               value={layout.pageSize}
@@ -201,12 +201,12 @@ export function ImageToPdfTool({ tool }: ToolPageProps) {
               onChange={(value) => setLayout((current) => ({ ...current, margin: value as MarginId }))}
             />
 
-            <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 sm:col-span-3">
+            <label className="flex items-center gap-2 text-sm font-bold text-stone-700 sm:col-span-3">
               <input
                 type="checkbox"
                 checked={merge}
                 onChange={(event) => setMerge(event.target.checked)}
-                className="size-4 accent-sky-600"
+                className="size-4 accent-brand-600"
               />
               {t('image-to-pdf:mergeIntoOne')}
             </label>
@@ -216,7 +216,7 @@ export function ImageToPdfTool({ tool }: ToolPageProps) {
                 type="button"
                 onClick={() => void convert()}
                 disabled={busy}
-                className="w-full rounded-full bg-sky-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-sky-700 disabled:opacity-60"
+                className="w-full rounded-full bg-brand-600 px-6 py-3 text-base font-bold text-white transition hover:bg-brand-700 disabled:opacity-60"
               >
                 {busy ? t('workspace:actions.working') : t('image-to-pdf:action')}
               </button>
@@ -265,12 +265,12 @@ function Select({
 }) {
   return (
     <label className={`block ${disabled ? 'opacity-50' : ''}`}>
-      <span className="text-sm font-semibold text-slate-700">{label}</span>
+      <span className="text-sm font-bold text-stone-700">{label}</span>
       <select
         value={value}
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-sky-400 disabled:cursor-not-allowed"
+        className="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-brand-500 disabled:cursor-not-allowed"
       >
         {options.map((option) => (
           <option key={option.id} value={option.id}>
@@ -278,7 +278,7 @@ function Select({
           </option>
         ))}
       </select>
-      {hint && <span className="mt-1 block text-xs text-slate-500">{hint}</span>}
+      {hint && <span className="mt-1 block text-xs text-stone-500">{hint}</span>}
     </label>
   );
 }

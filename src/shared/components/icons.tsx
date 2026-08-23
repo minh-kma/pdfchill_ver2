@@ -1,4 +1,5 @@
 import type { SVGProps } from 'react';
+import type { ToolCategory } from '../../toolRegistry.ts';
 
 export type IconComponent = (props: SVGProps<SVGSVGElement>) => React.JSX.Element;
 
@@ -19,96 +20,185 @@ function Svg({ children, ...props }: SVGProps<SVGSVGElement>) {
   );
 }
 
-/* --- Tool icons. Referenced only from src/toolRegistry.ts. --------------------------------- */
+/* --- Tool icons -----------------------------------------------------------------------------
+ *
+ * The 11 tool icons are SOLID two-tone fills, deliberately a different animal from the chrome
+ * icons at the bottom of this file, which stay 1.6-stroke outlines on a single `currentColor`.
+ * Do not merge the two wrappers: `Svg` sets `stroke`, `ToolSvg` sets neither stroke nor fill on
+ * the root, because each shape picks its own tone.
+ *
+ * The two tones arrive as CSS custom properties rather than props, so the registry contract is
+ * untouched — `IconComponent` is still `(props) => JSX.Element` and `toolRegistry.ts` still just
+ * stores the component. Whoever renders an icon sets the tones on any ancestor; `toolIconTone()`
+ * below derives them from the tool's category.
+ *
+ * Every tone falls back to `currentColor`, and that fallback is load-bearing: AllToolsMenu renders
+ * these same icons at 18px with no tile and a single text colour. There, primary and secondary
+ * collapse to one hue and `--icon-secondary-opacity` (0.42 by default) is the only thing keeping
+ * the two shapes apart — which is why the second tone is expressed as an opacity and not as a
+ * second colour. A tile that sets both tones explicitly also sets that opacity back to 1.
+ *
+ * `import type { ToolCategory }` is type-only on purpose: toolRegistry.ts imports this file, so a
+ * value import would close a module cycle. The type is erased at compile time; the cycle is not.
+ */
+
+function ToolSvg({ children, ...props }: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      {children}
+    </svg>
+  );
+}
+
+/** Foreground shape — the 600 step of the category ramp. */
+const P = { fill: 'var(--icon-primary, currentColor)' } as const;
+/** Backing shape — the 400 step. Opacity is what carries it in a monochrome context. */
+const S = {
+  fill: 'var(--icon-secondary, currentColor)',
+  fillOpacity: 'var(--icon-secondary-opacity, 0.42)',
+} as const;
+/** Punched-out detail. It reads as a hole, so it must match the tile behind the icon. */
+const K = { fill: 'var(--icon-knockout, #fff)' } as const;
+
+/**
+ * Category -> icon tones, as inline custom properties, plus the tile's own background.
+ *
+ * Keyed by the tool's EXISTING registry category, so a card's icon is the same hue as the filter
+ * tab that selects it. Keyed by category and not by tool id: adding a tool to a category that
+ * already exists needs no change here, and no tool is named in this file.
+ */
+const TONE_RAMP: Record<ToolCategory, string> = {
+  organize: 'brand',
+  optimize: 'accent',
+  convert: 'violet',
+  edit: 'sand',
+  security: 'green',
+};
+
+export function toolIconTone(category: ToolCategory): React.CSSProperties {
+  const ramp = TONE_RAMP[category];
+  return {
+    '--icon-primary': `var(--color-${ramp}-600)`,
+    '--icon-secondary': `var(--color-${ramp}-400)`,
+    '--icon-secondary-opacity': '1',
+    '--icon-knockout': `var(--color-${ramp}-100)`,
+    backgroundColor: `var(--color-${ramp}-100)`,
+  } as React.CSSProperties;
+}
 
 export const MergeIcon: IconComponent = (props) => (
-  <Svg {...props}>
-    <rect x="3" y="4" width="9" height="11" rx="1.5" />
-    <rect x="12" y="9" width="9" height="11" rx="1.5" />
-  </Svg>
+  <ToolSvg {...props}>
+    <rect {...S} x="2.5" y="2.5" width="12.5" height="15.5" rx="2.6" />
+    <rect {...P} x="9" y="6" width="12.5" height="15.5" rx="2.6" />
+  </ToolSvg>
 );
 
 export const SplitIcon: IconComponent = (props) => (
-  <Svg {...props}>
-    <rect x="3" y="4" width="7" height="16" rx="1.5" />
-    <rect x="14" y="4" width="7" height="16" rx="1.5" />
-    <path d="M12 3v18" strokeDasharray="2 3" />
-  </Svg>
+  <ToolSvg {...props}>
+    <rect {...P} x="2.5" y="3.5" width="8.2" height="17" rx="2.2" />
+    <rect {...S} x="13.3" y="3.5" width="8.2" height="17" rx="2.2" />
+  </ToolSvg>
 );
 
 export const ReorderIcon: IconComponent = (props) => (
-  <Svg {...props}>
-    <rect x="3" y="4" width="7" height="7" rx="1.5" />
-    <rect x="14" y="4" width="7" height="7" rx="1.5" />
-    <rect x="3" y="14" width="7" height="7" rx="1.5" />
-    <path d="M14 17.5h7M18.5 15l2.5 2.5-2.5 2.5" />
-  </Svg>
+  <ToolSvg {...props}>
+    <rect {...P} x="2.5" y="2.5" width="8.4" height="8.4" rx="2.4" />
+    <rect {...S} x="13.1" y="2.5" width="8.4" height="8.4" rx="2.4" />
+    <rect {...S} x="2.5" y="13.1" width="8.4" height="8.4" rx="2.4" />
+    <rect {...P} x="13.1" y="13.1" width="8.4" height="8.4" rx="2.4" />
+  </ToolSvg>
 );
 
 export const DeletePagesIcon: IconComponent = (props) => (
-  <Svg {...props}>
-    <path d="M6 7h12M10 7V5h4v2M8 7l.8 12.1A1 1 0 0 0 9.8 20h4.4a1 1 0 0 0 1-.9L16 7" />
-    <path d="M10.5 11v5M13.5 11v5" />
-  </Svg>
+  <ToolSvg {...props}>
+    <rect {...S} x="2.5" y="2" width="13.5" height="19" rx="2.6" />
+    <circle {...P} cx="17.2" cy="17.2" r="5.4" />
+    <rect {...K} x="14.2" y="16.2" width="6" height="2" rx="1" />
+  </ToolSvg>
 );
 
+// Arc band + arrowhead, not a stroked circle: everything in this group is a solid fill, so the
+// ring is a closed path between an outer arc (R 8.4) and an inner one (r 5.6). The gap sits at
+// 12 o'clock and the head points clockwise out of it.
 export const RotateIcon: IconComponent = (props) => (
-  <Svg {...props}>
-    <path d="M20 11a8 8 0 1 0-2.3 5.7" />
-    <path d="M20 5v6h-6" />
-  </Svg>
+  <ToolSvg {...props}>
+    <circle {...S} cx="12" cy="12" r="8.6" />
+    <path {...P} d="M11.27 3.63 A8.4 8.4 0 1 0 19.89 14.87 L17.26 13.92 A5.6 5.6 0 1 1 11.51 6.42 Z" />
+    <path {...P} d="M16.37 4.59 11.73 8.92 11.05 1.14 Z" />
+  </ToolSvg>
 );
 
 export const CompressIcon: IconComponent = (props) => (
-  <Svg {...props}>
-    <path d="M12 3v6M9 6l3-3 3 3" />
-    <path d="M12 21v-6M9 18l3 3 3-3" />
-    <path d="M4 12h16" />
-  </Svg>
+  <ToolSvg {...props}>
+    <rect {...S} x="2.5" y="10.8" width="19" height="2.6" rx="1.3" />
+    <path {...P} d="M12 9.9 7.9 5.6 h8.2 Z" />
+    <rect {...P} x="10.5" y="1.6" width="3" height="4.6" rx="1.5" />
+    <path {...P} d="M12 14.3 7.9 18.6 h8.2 Z" />
+    <rect {...P} x="10.5" y="18" width="3" height="4.6" rx="1.5" />
+  </ToolSvg>
 );
 
 export const OcrIcon: IconComponent = (props) => (
-  <Svg {...props}>
-    <rect x="3" y="4" width="18" height="16" rx="2" />
-    <path d="M7 9h4M7 13h10M7 17h7" />
-    <path d="M15 8.5 17 12l2-3.5" />
-  </Svg>
+  <ToolSvg {...props}>
+    <rect {...S} x="2.5" y="2" width="14.5" height="19" rx="2.6" />
+    <rect {...P} x="5.6" y="6.4" width="8.3" height="2.1" rx="1.05" />
+    <rect {...P} x="5.6" y="10.4" width="5.6" height="2.1" rx="1.05" />
+    <path
+      {...P}
+      d="M16.9 10.6a5.3 5.3 0 1 0 3.02 9.66l1.32 1.32a1.3 1.3 0 0 0 1.84-1.84l-1.32-1.32A5.3 5.3 0 0 0 16.9 10.6Zm0 2.6a2.7 2.7 0 1 1 0 5.4 2.7 2.7 0 0 1 0-5.4Z"
+    />
+  </ToolSvg>
 );
 
 export const ImageToPdfIcon: IconComponent = (props) => (
-  <Svg {...props}>
-    <rect x="3" y="4" width="18" height="16" rx="2" />
-    <circle cx="8.5" cy="9.5" r="1.5" />
-    <path d="m4 17 4.5-4.5L13 17" />
-    <path d="m13 17 3-3 4 4" />
-  </Svg>
+  <ToolSvg {...props}>
+    <rect {...S} x="2.5" y="2.5" width="13" height="16.5" rx="2.6" />
+    <rect {...P} x="8.5" y="6.5" width="13" height="15" rx="2.6" />
+    <circle {...K} cx="12.6" cy="11.1" r="1.7" />
+    <path {...K} d="M10 18.6 13.9 13.9 16.3 16.8 18 14.8 20.3 18.6 Z" />
+  </ToolSvg>
 );
 
+// The knockout bars are the page's text and the diagonal is the mark stamped over it — the
+// crossing is the whole metaphor, so the bar is sized to stay inside the page (a 13.6x3.2 bar
+// rotated 30 degrees spans x 5.3-18.7, y 7.2-16.8) rather than being clipped. No clipPath here
+// on purpose: it would need an id, and this icon renders many times on one page.
 export const WatermarkIcon: IconComponent = (props) => (
-  <Svg {...props}>
-    <rect x="3" y="4" width="18" height="16" rx="2" />
-    <path d="m7.5 16 9-8" strokeWidth={2.2} opacity={0.55} />
-    <path d="M8 8h3M13 16h3" opacity={0.55} />
-  </Svg>
+  <ToolSvg {...props}>
+    <rect {...S} x="2.5" y="2.5" width="19" height="19" rx="3" />
+    <rect {...K} x="6.2" y="5.6" width="8.4" height="1.9" rx="0.95" />
+    <rect {...K} x="9.4" y="16.6" width="8.4" height="1.9" rx="0.95" />
+    <rect
+      {...P}
+      x="5.9"
+      y="10.35"
+      width="12.2"
+      height="3.3"
+      rx="1.65"
+      transform="rotate(30 12 12)"
+    />
+  </ToolSvg>
 );
 
 export const ProtectIcon: IconComponent = (props) => (
-  <Svg {...props}>
-    <rect x="4.5" y="10" width="15" height="10" rx="2" />
-    <path d="M8 10V7.5a4 4 0 0 1 8 0V10" />
-    <path d="M12 14v2" />
-  </Svg>
+  <ToolSvg {...props}>
+    <path {...S} d="M7.8 11 V7.6 A4.2 4.2 0 0 1 16.2 7.6 V11 H14.2 V7.6 A2.2 2.2 0 0 0 9.8 7.6 V11 Z" />
+    <rect {...P} x="3.6" y="10" width="16.8" height="11.5" rx="3.2" />
+    <circle {...K} cx="12" cy="14.6" r="1.8" />
+    <rect {...K} x="11.1" y="15.4" width="1.8" height="3.4" rx="0.9" />
+  </ToolSvg>
 );
 
 export const UnlockIcon: IconComponent = (props) => (
-  <Svg {...props}>
-    <rect x="4.5" y="10" width="15" height="10" rx="2" />
-    <path d="M8 10V7.5a4 4 0 0 1 7.6-1.7" />
-    <path d="M12 14v2" />
-  </Svg>
+  <ToolSvg {...props}>
+    <path {...S} d="M7.8 11 V7.6 A4.2 4.2 0 0 1 16.2 7.6 H14.2 A2.2 2.2 0 0 0 9.8 7.6 V11 Z" />
+    <rect {...P} x="3.6" y="10" width="16.8" height="11.5" rx="3.2" />
+    <circle {...K} cx="12" cy="14.6" r="1.8" />
+    <rect {...K} x="11.1" y="15.4" width="1.8" height="3.4" rx="0.9" />
+  </ToolSvg>
 );
 
-/* --- Chrome icons. ------------------------------------------------------------------------- */
+/* --- Chrome icons. Outline, 1.6 stroke, one `currentColor`. Not two-tone; see above. -------- */
 
 export const ChevronDownIcon: IconComponent = (props) => (
   <Svg {...props}>

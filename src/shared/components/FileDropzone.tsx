@@ -49,23 +49,23 @@ export function FileDropzone({
       }}
       className={`flex flex-col items-center rounded-2xl border-2 border-dashed text-center transition ${
         compact ? 'p-5' : 'p-10 sm:p-14'
-      } ${dragging ? 'border-sky-400 bg-sky-50' : 'border-slate-300 bg-white'}`}
+      } ${dragging ? 'border-brand-500 bg-brand-50' : 'border-stone-300 bg-white'}`}
     >
       {!compact && (
-        <span className="mb-4 grid size-12 place-items-center rounded-xl bg-sky-50 text-sky-600">
+        <span className="mb-4 grid size-12 place-items-center rounded-tile bg-brand-100 text-brand-600">
           <UploadIcon className="size-6" />
         </span>
       )}
-      <h2 className={compact ? 'text-sm font-bold text-slate-800' : 'text-lg font-bold text-slate-900'}>
+      <h2 className={compact ? 'text-sm font-bold text-stone-800' : 'text-lg font-bold text-stone-900'}>
         {title}
       </h2>
-      <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
+      <p className="mt-1 text-sm text-stone-500">{subtitle}</p>
 
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
         disabled={busy}
-        className="mt-4 rounded-full bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:opacity-60"
+        className="mt-4 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-brand-700 disabled:opacity-60"
       >
         {busy ? t('workspace:upload.reading') : buttonLabel}
       </button>

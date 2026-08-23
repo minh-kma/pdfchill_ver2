@@ -87,7 +87,7 @@ function CompressPanel({ file }: { file: LoadedFile }) {
   if (running) return <RunningPanel progress={progress} />;
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5">
+    <div className="rounded-2xl border border-stone-200 bg-white p-5">
       {error && <ErrorBanner error={error} onDismiss={() => setError(undefined)} />}
 
       {outcome ? (
@@ -95,13 +95,13 @@ function CompressPanel({ file }: { file: LoadedFile }) {
       ) : (
         <>
           <fieldset>
-            <legend className="text-sm font-semibold text-slate-700">{t('compress:levelLabel')}</legend>
+            <legend className="text-sm font-bold text-stone-700">{t('compress:levelLabel')}</legend>
             <div className="mt-3 grid gap-2 sm:grid-cols-3">
               {COMPRESSION_LEVEL_IDS.map((id) => (
                 <label
                   key={id}
                   className={`cursor-pointer rounded-xl border p-3 transition ${
-                    level === id ? 'border-sky-400 bg-sky-50' : 'border-slate-200 hover:border-slate-300'
+                    level === id ? 'border-brand-500 bg-brand-50' : 'border-stone-200 hover:border-stone-300'
                   }`}
                 >
                   <input
@@ -112,8 +112,8 @@ function CompressPanel({ file }: { file: LoadedFile }) {
                     onChange={() => setLevel(id)}
                     className="sr-only"
                   />
-                  <span className="block text-sm font-bold text-slate-900">{t(`compress:levels.${id}.name`)}</span>
-                  <span className="mt-0.5 block text-xs text-slate-500">{t(`compress:levels.${id}.hint`)}</span>
+                  <span className="block text-sm font-bold text-stone-900">{t(`compress:levels.${id}.name`)}</span>
+                  <span className="mt-0.5 block text-xs text-stone-500">{t(`compress:levels.${id}.hint`)}</span>
                 </label>
               ))}
             </div>
@@ -122,7 +122,7 @@ function CompressPanel({ file }: { file: LoadedFile }) {
           <button
             type="button"
             onClick={() => void start()}
-            className="mt-5 w-full rounded-full bg-sky-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-sky-700"
+            className="mt-5 w-full rounded-full bg-brand-600 px-6 py-3 text-base font-bold text-white transition hover:bg-brand-700"
           >
             {t('compress:action')}
           </button>
@@ -145,21 +145,21 @@ function RunningPanel({ progress }: { progress: { phase: 'images' | 'structure';
   const pct = progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : undefined;
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5">
-      <p className="text-sm font-semibold text-slate-800">
+    <div className="rounded-2xl border border-stone-200 bg-white p-5">
+      <p className="text-sm font-bold text-stone-800">
         {progress.phase === 'structure'
           ? t('compress:progress.structure')
           : t('compress:progress.images', { done: progress.done, total: progress.total })}
       </p>
-      <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-stone-100">
         {/* The structural phase has no per-item count, so the bar holds at its last value
             rather than resetting (`spec/features.md` §1.5). */}
         <div
-          className="h-full rounded-full bg-sky-500 transition-all"
+          className="h-full rounded-full bg-brand-500 transition-all"
           style={{ width: `${pct ?? 100}%` }}
         />
       </div>
-      <p className="mt-2 text-xs text-slate-500">{t('compress:progress.cannotCancel')}</p>
+      <p className="mt-2 text-xs text-stone-500">{t('compress:progress.cannotCancel')}</p>
     </div>
   );
 }
@@ -192,27 +192,27 @@ function ResultPanel({
   return (
     <div>
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <span className="text-2xl font-extrabold text-slate-900">
+        <span className="text-2xl font-bold text-stone-900">
           {reduction > 0 ? t('compress:result.saved', { percent: reduction }) : t('compress:result.noChange')}
         </span>
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-stone-500">
           {formatBytes(outcome.before)} → {formatBytes(outcome.after)}
         </span>
       </div>
-      <p className="mt-2 text-sm text-slate-600">{detail}</p>
+      <p className="mt-2 text-sm text-stone-600">{detail}</p>
 
       <div className="mt-5 flex flex-wrap gap-2">
         <button
           type="button"
           onClick={onPreview}
-          className="rounded-full bg-sky-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-sky-700"
+          className="rounded-full bg-brand-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-brand-700"
         >
           {t('compress:result.review')}
         </button>
         <button
           type="button"
           onClick={onAgain}
-          className="rounded-full px-5 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+          className="rounded-full px-5 py-3 text-sm font-bold text-stone-600 transition hover:bg-stone-100"
         >
           {t('compress:result.tryAnother')}
         </button>

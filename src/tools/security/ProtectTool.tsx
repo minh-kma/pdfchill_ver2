@@ -50,7 +50,7 @@ function ProtectPanel({ file }: { file: LoadedFile }) {
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5">
+    <div className="rounded-2xl border border-stone-200 bg-white p-5">
       {error && <ErrorBanner error={error} onDismiss={() => setError(undefined)} />}
 
       <div className="space-y-4">
@@ -74,7 +74,7 @@ function ProtectPanel({ file }: { file: LoadedFile }) {
         />
       </div>
 
-      <p className="mt-4 rounded-lg bg-slate-50 px-3 py-2 text-xs leading-relaxed text-slate-600">
+      <p className="mt-4 rounded-lg bg-stone-50 px-3 py-2 text-xs leading-relaxed text-stone-600">
         {t('protect:note')}
       </p>
 
@@ -82,7 +82,7 @@ function ProtectPanel({ file }: { file: LoadedFile }) {
         type="button"
         onClick={() => void run()}
         disabled={busy}
-        className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-sky-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-sky-700 disabled:opacity-60"
+        className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3 text-base font-bold text-white transition hover:bg-brand-700 disabled:opacity-60"
       >
         <ProtectIcon className="size-5" />
         {busy ? t('workspace:actions.working') : t('protect:action')}
@@ -121,21 +121,21 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="text-sm font-semibold text-slate-700">{label}</span>
+      <span className="text-sm font-bold text-stone-700">{label}</span>
       <span className="mt-1.5 flex items-center gap-2">
         <input
           type={visible ? 'text' : 'password'}
           value={value}
           autoComplete="new-password"
           onChange={(event) => onChange(event.target.value)}
-          className={`w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-sky-400 ${
-            error ? 'border-red-300' : 'border-slate-300'
+          className={`w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-brand-500 ${
+            error ? 'border-red-300' : 'border-stone-300'
           }`}
         />
         <button
           type="button"
           onClick={onToggleVisible}
-          className="shrink-0 rounded-lg px-3 py-2 text-xs font-semibold text-slate-500 transition hover:bg-slate-100"
+          className="shrink-0 rounded-lg px-3 py-2 text-xs font-bold text-stone-500 transition hover:bg-stone-100"
         >
           {toggleLabel}
         </button>

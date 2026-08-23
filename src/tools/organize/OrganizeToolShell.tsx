@@ -49,8 +49,8 @@ export function OrganizeToolShell({
     <div className="mx-auto max-w-7xl px-4 py-10">
       <header className="mb-6">
         {/* Title and description come from the registry entry — never hardcoded per tool. */}
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">{t(tool.nameKey)}</h1>
-        <p className="mt-2 max-w-2xl text-slate-600">{t(tool.descriptionKey)}</p>
+        <h1 className="text-h1 text-stone-900">{t(tool.nameKey)}</h1>
+        <p className="mt-2 max-w-2xl text-stone-600">{t(tool.descriptionKey)}</p>
       </header>
 
       {error && <ErrorBanner error={error} onDismiss={clearError} />}

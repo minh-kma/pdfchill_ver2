@@ -96,8 +96,8 @@ function OcrPanel({ file }: { file: LoadedFile }) {
 
   if (running) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-5">
-        <p className="text-sm font-semibold text-slate-800">
+      <div className="rounded-2xl border border-stone-200 bg-white p-5">
+        <p className="text-sm font-bold text-stone-800">
           {status?.baking
             ? t('ocr:progress.finishing')
             : status
@@ -107,21 +107,21 @@ function OcrPanel({ file }: { file: LoadedFile }) {
                 })
               : t('ocr:progress.starting')}
         </p>
-        <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-stone-100">
           <div
-            className="h-full rounded-full bg-sky-500 transition-all"
+            className="h-full rounded-full bg-brand-500 transition-all"
             style={{
               width: `${status && status.totalPages > 0 ? Math.round((status.pageNumber / status.totalPages) * 100) : 5}%`,
             }}
           />
         </div>
-        <p className="mt-2 text-xs text-slate-500">{t('ocr:progress.cannotCancel')}</p>
+        <p className="mt-2 text-xs text-stone-500">{t('ocr:progress.cannotCancel')}</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5">
+    <div className="rounded-2xl border border-stone-200 bg-white p-5">
       {error && <ErrorBanner error={error} onDismiss={() => setError(undefined)} />}
 
       {result ? (
@@ -130,7 +130,7 @@ function OcrPanel({ file }: { file: LoadedFile }) {
               i18next keys carry a single `count`. Passing {recognized, skipped} to a key that
               only exists as `summary_one`/`summary_other` resolves to nothing and renders the raw
               key, which is exactly how this shipped broken. */}
-          <p className="text-sm font-semibold text-slate-900">
+          <p className="text-sm font-bold text-stone-900">
             {t('ocr:result.summary', {
               recognized: t('ocr:result.pages', { count: result.recognized }),
               skipped: t('ocr:result.pages', { count: result.skipped }),
@@ -139,7 +139,7 @@ function OcrPanel({ file }: { file: LoadedFile }) {
           <button
             type="button"
             onClick={() => setPreviewing(true)}
-            className="mt-4 rounded-full bg-sky-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-sky-700"
+            className="mt-4 rounded-full bg-brand-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-brand-700"
           >
             {t('ocr:result.review')}
           </button>
@@ -147,22 +147,22 @@ function OcrPanel({ file }: { file: LoadedFile }) {
       ) : (
         <>
           <fieldset>
-            <legend className="text-sm font-semibold text-slate-700">{t('ocr:languageLabel')}</legend>
+            <legend className="text-sm font-bold text-stone-700">{t('ocr:languageLabel')}</legend>
             <div className="mt-3 flex flex-wrap gap-2">
               {OCR_LANGUAGES.map((language) => (
                 <label
                   key={language}
-                  className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold transition ${
+                  className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm font-bold transition ${
                     languages.includes(language)
-                      ? 'border-sky-400 bg-sky-50 text-sky-800'
-                      : 'border-slate-200 text-slate-600 hover:border-slate-300'
+                      ? 'border-brand-500 bg-brand-50 text-brand-800'
+                      : 'border-stone-200 text-stone-600 hover:border-stone-300'
                   }`}
                 >
                   <input
                     type="checkbox"
                     checked={languages.includes(language)}
                     onChange={() => toggle(language)}
-                    className="size-4 accent-sky-600"
+                    className="size-4 accent-brand-600"
                   />
                   {t(`ocr:languages.${language}`)}
                 </label>
@@ -171,7 +171,7 @@ function OcrPanel({ file }: { file: LoadedFile }) {
           </fieldset>
 
           {/* Shown before the user can start (`spec/features.md` §1.6). */}
-          <p className="mt-4 rounded-lg bg-slate-50 px-3 py-2 text-xs leading-relaxed text-slate-600">
+          <p className="mt-4 rounded-lg bg-stone-50 px-3 py-2 text-xs leading-relaxed text-stone-600">
             {t('ocr:disclosure')}
           </p>
 
@@ -179,7 +179,7 @@ function OcrPanel({ file }: { file: LoadedFile }) {
             type="button"
             onClick={() => void start()}
             disabled={languages.length === 0}
-            className="mt-5 w-full rounded-full bg-sky-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-sky-700 disabled:opacity-60"
+            className="mt-5 w-full rounded-full bg-brand-600 px-6 py-3 text-base font-bold text-white transition hover:bg-brand-700 disabled:opacity-60"
           >
             {t('ocr:action')}
           </button>

@@ -71,7 +71,7 @@ export function App() {
       {/* Autosave stays suspended until the recovery decision is made. */}
       <SessionAutosave suspended={recovery.kind !== 'settled'} />
 
-      <div className="flex min-h-dvh flex-col bg-slate-50 text-slate-900">
+      <div className="flex min-h-dvh flex-col bg-canvas text-stone-900">
         <AppBar />
 
         {recovery.kind === 'offering' && (

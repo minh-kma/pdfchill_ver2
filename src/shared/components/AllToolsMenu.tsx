@@ -49,7 +49,7 @@ export function AllToolsMenu() {
         aria-controls={menuId}
         aria-haspopup="menu"
         onClick={() => setOpen((value) => !value)}
-        className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-900"
+        className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-bold text-stone-700 transition hover:bg-stone-100 hover:text-stone-900"
       >
         {t('nav:allTools')}
         <ChevronDownIcon className={`size-4 transition-transform ${open ? 'rotate-180' : ''}`} />
@@ -59,12 +59,12 @@ export function AllToolsMenu() {
         <div
           id={menuId}
           role="menu"
-          className="absolute start-0 top-full z-50 mt-2 w-[min(92vw,56rem)] rounded-2xl border border-slate-200 bg-white p-5 shadow-xl shadow-slate-900/5"
+          className="absolute start-0 top-full z-50 mt-2 w-[min(92vw,56rem)] rounded-2xl border border-stone-200 bg-white p-5 shadow-xl shadow-stone-900/5"
         >
           <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
             {groups.map(({ category, tools }) => (
               <section key={category.id}>
-                <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+                <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-stone-500">
                   {t(category.labelKey)}
                 </h3>
                 <ul className="space-y-0.5">
@@ -76,9 +76,9 @@ export function AllToolsMenu() {
                           role="menuitem"
                           to={buildPath(tool.slug, language)}
                           onClick={() => setOpen(false)}
-                          className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm text-slate-700 transition hover:bg-sky-50 hover:text-sky-700"
+                          className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm text-stone-700 transition hover:bg-brand-50 hover:text-brand-700"
                         >
-                          <Icon className="size-4.5 shrink-0 text-slate-400" />
+                          <Icon className="size-4.5 shrink-0 text-stone-500" />
                           {t(tool.nameKey)}
                         </Link>
                       </li>

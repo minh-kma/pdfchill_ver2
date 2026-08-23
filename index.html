@@ -20,8 +20,12 @@
     <link rel="icon" href="/favicon-16.png" type="image/png" sizes="16x16" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <!-- Matches the AppBar, which is what sits under the mobile browser chrome. -->
-    <meta name="theme-color" content="#ffffff" />
+    <!--
+      The page background, so the mobile browser chrome blends into the page rather than
+      butting a white bar against a cream one. Tracks --color-canvas in src/index.css and
+      the manifest colours in scripts/prerender.mjs; all three change together.
+    -->
+    <meta name="theme-color" content="#f5ece7" />
 
     <!--
       Single SPA entry point, and the template scripts/prerender.mjs rewrites per route.

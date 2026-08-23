@@ -49,13 +49,13 @@ export function ZoomModalChrome({
       role="dialog"
       aria-modal="true"
       aria-label={title}
-      className="fixed inset-0 z-50 flex flex-col bg-slate-900/80"
+      className="fixed inset-0 z-50 flex flex-col bg-stone-900/80"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
     >
       <div className="flex items-center gap-2 px-4 py-3 text-white">
-        <span className="text-sm font-semibold">{title}</span>
+        <span className="text-sm font-bold">{title}</span>
         {controls && <div className="ms-auto flex items-center gap-1">{controls}</div>}
         <button
           type="button"

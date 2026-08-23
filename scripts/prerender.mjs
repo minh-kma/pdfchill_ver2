@@ -220,8 +220,11 @@ function renderWebManifest(t) {
       start_url: '/',
       scope: '/',
       display: 'standalone',
-      background_color: '#f8fafc',
-      theme_color: '#ffffff',
+      // Both track --color-canvas in src/index.css (oklch(95% 0.012 52)). The manifest
+      // cannot read a CSS variable, so this is the one place the page background is
+      // duplicated as a literal — change it here whenever that token changes.
+      background_color: '#f5ece7',
+      theme_color: '#f5ece7',
       icons: [
         { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
         { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },

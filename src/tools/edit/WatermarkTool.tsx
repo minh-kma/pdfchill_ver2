@@ -128,7 +128,7 @@ function WatermarkPanel() {
     /* Single column: the shell now supplies the side-by-side split (grid | action panel), so this
        panel stacks its controls and its sample preview inside that one column. */
     <div className="space-y-6">
-      <div className="rounded-2xl border border-slate-200 bg-white p-5">
+      <div className="rounded-2xl border border-stone-200 bg-white p-5">
         {error && <ErrorBanner error={error} onDismiss={() => setError(undefined)} />}
 
         <div className="mb-4 flex gap-2">
@@ -137,10 +137,10 @@ function WatermarkPanel() {
               key={option}
               type="button"
               onClick={() => setMode(option)}
-              className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition ${
+              className={`flex-1 rounded-lg px-3 py-2 text-sm font-bold transition ${
                 mode === option
-                  ? 'bg-slate-900 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  ? 'bg-stone-900 text-white'
+                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
               }`}
             >
               {t(`watermark:mode.${option}`)}
@@ -151,12 +151,12 @@ function WatermarkPanel() {
         {mode === 'text' ? (
           <div className="space-y-4">
             <label className="block">
-              <span className="text-sm font-semibold text-slate-700">{t('watermark:textLabel')}</span>
+              <span className="text-sm font-bold text-stone-700">{t('watermark:textLabel')}</span>
               <input
                 value={text}
                 onChange={(event) => setText(event.target.value)}
                 placeholder={t('watermark:textPlaceholder')}
-                className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-sky-400"
+                className="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-brand-500"
               />
             </label>
 
@@ -179,12 +179,12 @@ function WatermarkPanel() {
             />
 
             <label className="flex items-center gap-3">
-              <span className="text-sm font-semibold text-slate-700">{t('watermark:color')}</span>
+              <span className="text-sm font-bold text-stone-700">{t('watermark:color')}</span>
               <input
                 type="color"
                 value={color}
                 onChange={(event) => setColor(event.target.value)}
-                className="h-8 w-14 cursor-pointer rounded border border-slate-300"
+                className="h-8 w-14 cursor-pointer rounded border border-stone-300"
               />
             </label>
           </div>
@@ -193,11 +193,11 @@ function WatermarkPanel() {
             <button
               type="button"
               onClick={() => fileInput.current?.click()}
-              className="w-full rounded-lg border-2 border-dashed border-slate-300 px-4 py-6 text-sm font-semibold text-slate-600 transition hover:border-sky-400 hover:bg-sky-50"
+              className="w-full rounded-lg border-2 border-dashed border-stone-300 px-4 py-6 text-sm font-bold text-stone-600 transition hover:border-brand-500 hover:bg-brand-50"
             >
               {assetId ? t('watermark:replaceImage') : t('watermark:chooseImage')}
             </button>
-            <p className="mt-2 text-xs text-slate-500">{t('watermark:imageHint')}</p>
+            <p className="mt-2 text-xs text-stone-500">{t('watermark:imageHint')}</p>
             <input
               ref={fileInput}
               type="file"
@@ -212,7 +212,7 @@ function WatermarkPanel() {
           </div>
         )}
 
-        <div className="mt-4 border-t border-slate-100 pt-4">
+        <div className="mt-4 border-t border-stone-100 pt-4">
           <Slider
             label={t('watermark:opacity')}
             value={opacityPercent}
@@ -223,24 +223,24 @@ function WatermarkPanel() {
           />
         </div>
 
-        <fieldset className="mt-4 border-t border-slate-100 pt-4">
-          <legend className="text-sm font-semibold text-slate-700">{t('watermark:pages')}</legend>
+        <fieldset className="mt-4 border-t border-stone-100 pt-4">
+          <legend className="text-sm font-bold text-stone-700">{t('watermark:pages')}</legend>
           <div className="mt-2 flex flex-wrap items-center gap-3">
-            <label className="flex items-center gap-2 text-sm text-slate-600">
+            <label className="flex items-center gap-2 text-sm text-stone-600">
               <input
                 type="radio"
                 checked={allPages}
                 onChange={() => setAllPages(true)}
-                className="size-4 accent-sky-600"
+                className="size-4 accent-brand-600"
               />
               {t('watermark:allPages')}
             </label>
-            <label className="flex items-center gap-2 text-sm text-slate-600">
+            <label className="flex items-center gap-2 text-sm text-stone-600">
               <input
                 type="radio"
                 checked={!allPages}
                 onChange={() => setAllPages(false)}
-                className="size-4 accent-sky-600"
+                className="size-4 accent-brand-600"
               />
               {t('watermark:pageRange')}
             </label>
@@ -263,7 +263,7 @@ function WatermarkPanel() {
             type="button"
             onClick={apply}
             disabled={!hasContent || !rangeValid}
-            className="rounded-full bg-sky-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:opacity-60"
+            className="rounded-full bg-brand-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-brand-700 disabled:opacity-60"
           >
             {t(existing ? 'watermark:update' : 'watermark:apply')}
           </button>
@@ -271,7 +271,7 @@ function WatermarkPanel() {
             <button
               type="button"
               onClick={remove}
-              className="rounded-full px-5 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+              className="rounded-full px-5 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50"
             >
               {t('watermark:remove')}
             </button>
@@ -284,13 +284,13 @@ function WatermarkPanel() {
           </p>
         )}
 
-        <div className="mt-6 border-t border-slate-100 pt-5">
+        <div className="mt-6 border-t border-stone-100 pt-5">
           <BuildAction labelKey="watermark:action" suffix="watermarked" />
         </div>
       </div>
 
       <div>
-        <p className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+        <p className="mb-2 text-xs font-bold uppercase tracking-wider text-stone-500">
           {t('watermark:preview')}
         </p>
         {firstPage && firstSource ? (
@@ -318,9 +318,9 @@ function Slider({
 }) {
   return (
     <label className="block">
-      <span className="flex items-baseline justify-between text-sm font-semibold text-slate-700">
+      <span className="flex items-baseline justify-between text-sm font-bold text-stone-700">
         {label}
-        <span className="text-xs font-normal tabular-nums text-slate-500">
+        <span className="text-xs font-normal tabular-nums text-stone-500">
           {value}
           {suffix}
         </span>
@@ -331,7 +331,7 @@ function Slider({
         max={max}
         value={value}
         onChange={(event) => onChange(Number(event.target.value))}
-        className="mt-1.5 w-full accent-sky-600"
+        className="mt-1.5 w-full accent-brand-600"
       />
     </label>
   );
@@ -353,7 +353,7 @@ function NumberBox({
       value={value}
       aria-label={label}
       onChange={(event) => onChange(Number(event.target.value))}
-      className="w-20 rounded-lg border border-slate-300 px-2 py-1.5 text-sm outline-none focus:border-sky-400"
+      className="w-20 rounded-lg border border-stone-300 px-2 py-1.5 text-sm outline-none focus:border-brand-500"
     />
   );
 }

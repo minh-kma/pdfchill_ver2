@@ -12,14 +12,14 @@ export function ComingSoonTool({ tool }: ToolPageProps) {
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col items-center px-4 py-20 text-center">
-      <span className="mb-6 grid size-16 place-items-center rounded-2xl bg-sky-50 text-sky-600 ring-1 ring-sky-100">
+      <span className="mb-6 grid size-16 place-items-center rounded-tile bg-brand-100 text-brand-600 ring-1 ring-brand-200">
         <Icon className="size-8" />
       </span>
-      <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+      <h1 className="text-h1 text-stone-900">
         {t(tool.nameKey)}
       </h1>
-      <p className="mt-3 max-w-xl text-slate-600">{t(tool.descriptionKey)}</p>
-      <p className="mt-8 rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600">
+      <p className="mt-3 max-w-xl text-stone-600">{t(tool.descriptionKey)}</p>
+      <p className="mt-8 rounded-full bg-stone-100 px-4 py-2 text-sm font-normal text-stone-600">
         {t('common:comingSoon', { tool: t(tool.nameKey) })}
       </p>
     </div>
