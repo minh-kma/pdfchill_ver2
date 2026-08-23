@@ -156,7 +156,7 @@ function WatermarkPanel() {
                 value={text}
                 onChange={(event) => setText(event.target.value)}
                 placeholder={t('watermark:textPlaceholder')}
-                className="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-brand-500"
+                className="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-brand-500"
               />
             </label>
 
@@ -353,7 +353,7 @@ function NumberBox({
       value={value}
       aria-label={label}
       onChange={(event) => onChange(Number(event.target.value))}
-      className="w-20 rounded-lg border border-stone-300 px-2 py-1.5 text-sm outline-none focus:border-brand-500"
+      className="w-20 rounded-lg border border-stone-300 px-2 py-1.5 text-sm focus:border-brand-500"
     />
   );
 }

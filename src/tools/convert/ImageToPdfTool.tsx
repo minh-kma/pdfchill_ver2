@@ -270,7 +270,7 @@ function Select({
         value={value}
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-brand-500 disabled:cursor-not-allowed"
+        className="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-brand-500 disabled:cursor-not-allowed"
       >
         {options.map((option) => (
           <option key={option.id} value={option.id}>
